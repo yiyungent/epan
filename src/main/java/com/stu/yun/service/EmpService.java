@@ -1,6 +1,6 @@
-package com.iss.spring.service;
+package com.stu.yun.service;
 
-import com.iss.spring.model.Emp;
+import com.stu.yun.model.Emp;
 
 import java.util.List;
 

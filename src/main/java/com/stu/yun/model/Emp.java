@@ -1,4 +1,4 @@
-package com.iss.spring.model;
+package com.stu.yun.model;
 
 public class Emp {
 

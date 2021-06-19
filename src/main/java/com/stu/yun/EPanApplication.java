@@ -1,14 +1,14 @@
-package com.iss.spring;
+package com.stu.yun;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 //@MapperScan
-public class SpringBootProjectApplication {
+public class EPanApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBootProjectApplication.class, args);
+		SpringApplication.run(EPanApplication.class, args);
 	}
 
 }

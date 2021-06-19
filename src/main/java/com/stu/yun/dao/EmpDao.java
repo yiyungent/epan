@@ -1,6 +1,6 @@
-package com.iss.spring.dao;
+package com.stu.yun.dao;
 
-import com.iss.spring.model.Emp;
+import com.stu.yun.model.Emp;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

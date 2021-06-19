@@ -1,8 +1,8 @@
-package com.iss.spring.service.impl;
+package com.stu.yun.service.impl;
 
-import com.iss.spring.dao.EmpDao;
-import com.iss.spring.model.Emp;
-import com.iss.spring.service.EmpService;
+import com.stu.yun.dao.EmpDao;
+import com.stu.yun.model.Emp;
+import com.stu.yun.service.EmpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

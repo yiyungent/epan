@@ -1,7 +1,7 @@
-package com.iss.spring.controller;
+package com.stu.yun.controller;
 
-import com.iss.spring.model.Emp;
-import com.iss.spring.service.EmpService;
+import com.stu.yun.model.Emp;
+import com.stu.yun.service.EmpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
