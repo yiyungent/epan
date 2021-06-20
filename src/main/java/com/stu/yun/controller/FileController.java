@@ -1,7 +1,14 @@
 package com.stu.yun.controller;
 
+import com.stu.yun.model.RealFile;
+import com.stu.yun.model.UserInfo;
+import com.stu.yun.model.VirtualFile;
+import com.stu.yun.responseModel.FileList;
+import com.stu.yun.responseModel.FileListItem;
 import com.stu.yun.responseModel.JsonResponse;
 import com.stu.yun.service.HDFSService;
+import com.stu.yun.service.RealFileService;
+import com.stu.yun.service.VirtualFileService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +21,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpSession;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/file")
@@ -21,6 +31,12 @@ public class FileController {
 
     @Autowired
     private HDFSService hdfsService;
+
+    @Autowired
+    private VirtualFileService virtualFileService;
+
+    @Autowired
+    private RealFileService realFileService;
 
     private static final String HDFS_FilePath_Base ="/epan-hdfs/";
 
@@ -32,11 +48,37 @@ public class FileController {
      */
     @GetMapping("list")
     public JsonResponse list(HttpSession session, Integer fileParentId){
-        // TODO: 1. 获取当前登录用户
-        // TODO: 2. 获取 虚拟文件目录
+        // 1. 获取当前登录用户
+        UserInfo currentUser = (UserInfo)session.getAttribute("user");
 
+        // 2. 获取 虚拟文件目录
+        List<VirtualFile> virtualFileList = this.virtualFileService.userList(currentUser.getId(), fileParentId);
+        if (virtualFileList == null) {
+            virtualFileList = new ArrayList<>();
+        }
+        // dbModel -> DTO
+        FileList fileList = new FileList();
+        List<FileListItem> listItemList = new ArrayList<>();
+        SimpleDateFormat sformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for (VirtualFile virtualFile : virtualFileList) {
+            FileListItem item = new FileListItem();
+            item.setFileId(virtualFile.getId());
+            item.setFileName(virtualFile.getFileName());
+            item.setCreateTime(sformat.format(virtualFile.getCreateTime()));
+            item.setFileType(virtualFile.getFileType());
+
+            RealFile realFile = virtualFile.getRealFile();
+            item.setFileSize(realFile.getFileSize());
+
+            listItemList.add(item);
+        }
+        fileList.setFileParentId(fileParentId);
+        fileList.setList(listItemList);
 
         JsonResponse response = new JsonResponse();
+        response.setCode(1);
+        response.setMessage("加载文件列表成功");
+        response.setData(fileList);
 
         return response;
     }

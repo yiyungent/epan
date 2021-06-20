@@ -2,8 +2,46 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.stu.yun.dao.VirtualFileDao">
 
+    <resultMap id="virtualFileMap" type="VirtualFile">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parentId"/>
+        <result property="fileType" column="fileType"/>
+        <result property="fileName" column="fileName"/>
+        <result property="createTime" column="createTime"/>
+        <result property="userInfoId" column="userInfoId"/>
+        <result property="realFileId" column="realFileId"/>
+        <association property="userInfo" javaType="UserInfo">
+            <id property="id" column="userInfoId"/>
+            <result property="userName" column="userName"/>
+            <result property="password" column="password"/>
+            <result property="diskSize" column="diskSize"/>
+            <result property="usedDiskSize" column="usedDiskSize"/>
+        </association>
+        <association property="realFile" javaType="RealFile">
+            <id property="id" column="realFileId"/>
+            <result property="signKey" column="signKey"/>
+            <result property="sourceType" column="sourceType"/>
+            <result property="filePath" column="filePath"/>
+            <result property="fileSize" column="fileSize"/>
+        </association>
+    </resultMap>
 
-
+    <select id="userList" resultMap="virtualFileMap">
+        select
+            v.id, v.parentId, v.fileType, v.fileName, v.userInfoId, v.realFileId, v.createTime,
+            u.userName, u.password, u.diskSize, u.usedDiskSize,
+            r.signKey, r.sourceType, r.filePath, r.fileSize
+        from
+            virtualFile as v
+        left join
+            userInfo as u
+            on v.userInfoId = u.id
+        left join
+            realFile as r
+            on v.realFileId = r.id
+        where
+            userInfoId = #{userInfoId} and parentId = #{parentId}
+    </select>
 
     <insert id="insert" parameterType="com.stu.yun.model.VirtualFile" keyProperty="id" useGeneratedKeys="true">
         insert into

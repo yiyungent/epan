@@ -38,4 +38,46 @@ public class RealFile {
      */
     private Long fileSize;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getSignKey() {
+        return signKey;
+    }
+
+    public void setSignKey(String signKey) {
+        this.signKey = signKey;
+    }
+
+    public int getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(int sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+
+
 }

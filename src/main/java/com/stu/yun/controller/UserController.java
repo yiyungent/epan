@@ -39,6 +39,7 @@ public class UserController {
         return response;
     }
 
+    @PostMapping("register")
     public JsonResponse register(String userName, String password){
         UserInfo dbUser = new UserInfo();
         // TODO: 效验是否已经存在此用户名

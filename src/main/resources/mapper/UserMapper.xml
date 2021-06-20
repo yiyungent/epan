@@ -2,6 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.stu.yun.dao.UserDao">
 
+    <resultMap id="userMap" type="UserInfo">
+        <id property="id" column="id"/>
+        <result property="userName" column="userName"/>
+        <result property="password" column="password"/>
+        <result property="diskSize" column="diskSize"/>
+        <result property="usedDiskSize" column="usedDiskSize"/>
+    </resultMap>
+
     <select id="queryByUserName" resultType="com.stu.yun.model.UserInfo">
         select
             id, userName, password, diskSize, usedDiskSize

@@ -49,4 +49,80 @@ public class VirtualFile {
     private Date createTime;
 
 
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
+    }
+
+    public int getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(int fileType) {
+        this.fileType = fileType;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public int getUserInfoId() {
+        return userInfoId;
+    }
+
+    public void setUserInfoId(int userInfoId) {
+        this.userInfoId = userInfoId;
+    }
+
+    public UserInfo getUserInfo() {
+        return userInfo;
+    }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
+    public int getRealFileId() {
+        return realFileId;
+    }
+
+    public void setRealFileId(int realFileId) {
+        this.realFileId = realFileId;
+    }
+
+    public RealFile getRealFile() {
+        return realFile;
+    }
+
+    public void setRealFile(RealFile realFile) {
+        this.realFile = realFile;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+
+
+
 }

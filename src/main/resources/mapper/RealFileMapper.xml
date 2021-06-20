@@ -2,6 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.stu.yun.dao.RealFileDao">
 
+    <resultMap id="realFileMap" type="RealFile">
+        <id property="id" column="id"/>
+        <result property="signKey" column="signKey"/>
+        <result property="sourceType" column="sourceType"/>
+        <result property="filePath" column="filePath"/>
+        <result property="fileSize" column="fileSize"/>
+    </resultMap>
 
     <insert id="insert" parameterType="com.stu.yun.model.RealFile" keyProperty="id" useGeneratedKeys="true">
         insert into
