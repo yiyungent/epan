@@ -8,4 +8,6 @@ public interface RealFileDao {
 
 
     int insert(RealFile realFile);
+
+    RealFile queryBySignKey(String signKey);
 }

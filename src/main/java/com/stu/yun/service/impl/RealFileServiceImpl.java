@@ -14,7 +14,16 @@ public class RealFileServiceImpl  implements RealFileService {
 
 
     @Override
-    public int insert(RealFile realFile) {
-        return this.realFileDao.insert(realFile);
+    public boolean insert(RealFile realFile) {
+        return this.realFileDao.insert(realFile) == 1;
     }
+
+    @Override
+    public RealFile queryBySignKey(String signKey) {
+        return this.realFileDao.queryBySignKey(signKey);
+    }
+
+
+
+
 }

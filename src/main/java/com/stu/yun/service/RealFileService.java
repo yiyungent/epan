@@ -4,6 +4,7 @@ import com.stu.yun.model.RealFile;
 
 public interface RealFileService {
 
-    int insert(RealFile realFile);
+    boolean insert(RealFile realFile);
 
+    RealFile queryBySignKey(String signKey);
 }

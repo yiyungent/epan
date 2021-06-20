@@ -1,6 +1,6 @@
 package com.stu.yun.responseModel;
 
-public class FileListItem {
+public class FileListItemRes {
 
     /**
      * 虚拟文件ID

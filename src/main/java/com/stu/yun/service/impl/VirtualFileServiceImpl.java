@@ -15,8 +15,8 @@ public class VirtualFileServiceImpl implements VirtualFileService {
     private VirtualFileDao virtualFileDao;
 
     @Override
-    public int insert(VirtualFile virtualFile) {
-        return this.virtualFileDao.insert(virtualFile);
+    public boolean insert(VirtualFile virtualFile) {
+        return this.virtualFileDao.insert(virtualFile) == 1;
     }
 
     @Override

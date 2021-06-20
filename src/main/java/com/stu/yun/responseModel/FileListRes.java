@@ -2,9 +2,9 @@ package com.stu.yun.responseModel;
 
 import java.util.List;
 
-public class FileList {
+public class FileListRes {
 
-    private List<FileListItem> list;
+    private List<FileListItemRes> list;
 
     /**
      * 当前 虚拟文件父级ID
@@ -12,11 +12,11 @@ public class FileList {
     private int fileParentId;
 
 
-    public List<FileListItem> getList() {
+    public List<FileListItemRes> getList() {
         return list;
     }
 
-    public void setList(List<FileListItem> list) {
+    public void setList(List<FileListItemRes> list) {
         this.list = list;
     }
 

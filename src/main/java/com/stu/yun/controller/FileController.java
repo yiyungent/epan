@@ -3,9 +3,11 @@ package com.stu.yun.controller;
 import com.stu.yun.model.RealFile;
 import com.stu.yun.model.UserInfo;
 import com.stu.yun.model.VirtualFile;
-import com.stu.yun.responseModel.FileList;
-import com.stu.yun.responseModel.FileListItem;
+import com.stu.yun.requestModel.UploadCheckReq;
+import com.stu.yun.responseModel.FileListItemRes;
+import com.stu.yun.responseModel.FileListRes;
 import com.stu.yun.responseModel.JsonResponse;
+import com.stu.yun.responseModel.UploadCheckRes;
 import com.stu.yun.service.HDFSService;
 import com.stu.yun.service.RealFileService;
 import com.stu.yun.service.VirtualFileService;
@@ -23,6 +25,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -57,11 +60,11 @@ public class FileController {
             virtualFileList = new ArrayList<>();
         }
         // dbModel -> DTO
-        FileList fileList = new FileList();
-        List<FileListItem> listItemList = new ArrayList<>();
+        FileListRes fileList = new FileListRes();
+        List<FileListItemRes> listItemList = new ArrayList<>();
         SimpleDateFormat sformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (VirtualFile virtualFile : virtualFileList) {
-            FileListItem item = new FileListItem();
+            FileListItemRes item = new FileListItemRes();
             item.setFileId(virtualFile.getId());
             item.setFileName(virtualFile.getFileName());
             item.setCreateTime(sformat.format(virtualFile.getCreateTime()));
@@ -86,18 +89,57 @@ public class FileController {
 
     /**
      * 文件上传检查: 秒传: 通过接收客户端计算的文件MD5，判断是否需要上传到服务端
-     * @param fileSignKey 文件MD5
      * @return
      */
     @PostMapping("uploadCheck")
-    public JsonResponse uploadCheck(HttpSession session, String fileSignKey){
-        // TODO: 1. 秒传检验
-        // 1.1 接收客户端计算的文件MD5
-        // 1.2 select RealFile: 查询 RealFile 是否已存在 相同 MD5
-        // 1.3 已存在: insert VirtualFile, 响应 秒传成功
-        // 1.4 不存在: 响应 客户端 需要 继续普通上传文件 -> upload()
-
+    public JsonResponse uploadCheck(HttpSession session, @RequestBody UploadCheckReq inputModel){
         JsonResponse response = new JsonResponse();
+        try {
+            // 1. 获取当前登录用户
+            UserInfo currentUser = (UserInfo)session.getAttribute("user");
+
+            // 2. 秒传检验
+            // 2.1 接收客户端计算的文件MD5
+            // 2.2 select RealFile: 查询 RealFile 是否已存在 相同 MD5
+            RealFile realFile = this.realFileService.queryBySignKey(inputModel.getFileSignKey());
+            if (realFile != null) {
+                // 2.3 已存在: insert VirtualFile, 响应 秒传成功
+                VirtualFile virtualFile = new VirtualFile();
+                virtualFile.setCreateTime(new Date());
+                virtualFile.setFileName(inputModel.getFileName());
+                virtualFile.setFileType(0);
+                virtualFile.setParentId(inputModel.getFileParentId());
+                virtualFile.setUserInfoId(currentUser.getId());
+                virtualFile.setRealFileId(realFile.getId());
+
+                boolean isSuccess = this.virtualFileService.insert(virtualFile);
+                if (!isSuccess){
+                    response.setCode(-2);
+                    response.setMessage("秒传失败");
+                    UploadCheckRes uploadCheckRes = new UploadCheckRes();
+                    uploadCheckRes.setFileName(virtualFile.getFileName());
+                    uploadCheckRes.setFileSignKey(realFile.getSignKey());
+                    response.setData(uploadCheckRes);
+
+                    return response;
+                }
+                response.setCode(1);
+                response.setMessage("上传成功: 秒传");
+                UploadCheckRes uploadCheckRes = new UploadCheckRes();
+                uploadCheckRes.setFileId(virtualFile.getId());
+                uploadCheckRes.setFileName(virtualFile.getFileName());
+                uploadCheckRes.setFileSignKey(realFile.getSignKey());
+                response.setData(uploadCheckRes);
+            } else {
+                // 2.4 不存在: 响应 客户端 需要 继续普通上传文件 -> upload()
+                response.setCode(2);
+                response.setMessage("无法秒传, 需要继续上传");
+                response.setData(inputModel.getFileSignKey());
+            }
+        } catch (Exception e) {
+            response.setCode(-1);
+            response.setMessage("失败: " + e.getMessage());
+        }
 
         return response;
     }

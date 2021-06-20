@@ -10,6 +10,15 @@
         <result property="fileSize" column="fileSize"/>
     </resultMap>
 
+    <select id="queryBySignKey" resultMap="realFileMap">
+        select
+            id, signKey, sourceType, filePath, fileSize
+        from
+            realFile
+        where
+            signKey = #{signKey}
+    </select>
+
     <insert id="insert" parameterType="com.stu.yun.model.RealFile" keyProperty="id" useGeneratedKeys="true">
         insert into
             realFile(id, signKey, sourceType, filePath, fileSize)

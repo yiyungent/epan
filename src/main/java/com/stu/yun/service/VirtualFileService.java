@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface VirtualFileService {
 
-    int insert(VirtualFile virtualFile);
+    boolean insert(VirtualFile virtualFile);
 
     List<VirtualFile> userList(int userId, Integer fileParentId);
 }
