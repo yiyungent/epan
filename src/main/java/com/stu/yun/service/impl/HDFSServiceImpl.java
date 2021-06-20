@@ -28,6 +28,7 @@ public class HDFSServiceImpl implements HDFSService {
         try {
             Configuration conf = new Configuration();
             conf.set("dfs.client.use.datanode.hostname", "true");
+            conf.set("dfs.replication", "1");
 
             fs = FileSystem.get(URI.create(hdfsURI), conf);
         } catch (Exception e) {
@@ -68,7 +69,14 @@ public class HDFSServiceImpl implements HDFSService {
 
     @Override
     public boolean delete(String filePath) {
-        return false;
+        boolean flag = false;
+        try {
+            // 第二个参数: true: 递归删除
+            flag = this.getFileSystem().delete(new Path(filePath), true);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return flag;
     }
 
 }
