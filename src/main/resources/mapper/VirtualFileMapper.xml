@@ -40,7 +40,7 @@
             realFile as r
             on v.realFileId = r.id
         where
-            userInfoId = #{userInfoId} and parentId = #{parentId}
+            userInfoId = #{userId} and parentId = #{fileParentId}
     </select>
 
     <insert id="insert" parameterType="com.stu.yun.model.VirtualFile" keyProperty="id" useGeneratedKeys="true">

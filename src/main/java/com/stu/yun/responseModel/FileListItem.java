@@ -14,6 +14,15 @@ public class FileListItem {
 
     private String fileName;
 
+    /**
+     * 文件类型:
+     * 0: 普通文件
+     * 1: 文件夹
+     */
+    private int fileType;
+
+    private String createTime;
+
     public int getFileId() {
         return fileId;
     }
@@ -54,12 +63,5 @@ public class FileListItem {
         this.createTime = createTime;
     }
 
-    /**
-     * 文件类型:
-     * 0: 普通文件
-     * 1: 文件夹
-     */
-    private int fileType;
 
-    private String createTime;
 }
