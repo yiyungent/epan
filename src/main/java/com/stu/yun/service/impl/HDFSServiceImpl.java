@@ -26,7 +26,10 @@ public class HDFSServiceImpl implements HDFSService {
         System.setProperty("HADOOP_USER_NAME", "root");
         FileSystem fs = null;
         try {
-            fs = FileSystem.get(URI.create(hdfsURI), new Configuration());
+            Configuration conf = new Configuration();
+            conf.set("dfs.client.use.datanode.hostname", "true");
+
+            fs = FileSystem.get(URI.create(hdfsURI), conf);
         } catch (Exception e) {
             System.out.println("HDFS: getFileSystem: " + e.getMessage());
         }
