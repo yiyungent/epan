@@ -2,7 +2,7 @@
 > Build
 
 ```bash
-mvc complie
+mvn complie
 ```
 
 > 打包 jar
