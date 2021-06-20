@@ -19,8 +19,6 @@ public class HDFSServiceImpl implements HDFSService {
     @Value("${hadoop.hdfs.uri}")
     private String hdfsURI;
 
-    private static final String HDFS_File_Prefix="/epan-hdfs/";
-
     /**
      * 获取 HDFS 文件系统对象
      */
@@ -40,7 +38,7 @@ public class HDFSServiceImpl implements HDFSService {
         boolean flag = false;
         FSDataOutputStream fos = null;
         try {
-            fos = this.getFileSystem().create(new Path(HDFS_File_Prefix + filePath));
+            fos = this.getFileSystem().create(new Path(filePath));
             byte[] buffer = new byte[1024];
             int len = 0;
             while ((len = input.read(buffer)) != -1) {
@@ -54,6 +52,7 @@ public class HDFSServiceImpl implements HDFSService {
         return flag;
     }
 
+    @Override
     public InputStream download(String path) {
         FSDataInputStream fis = null;
         try {

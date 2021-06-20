@@ -15,13 +15,13 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 
 @RestController
-@RequestMapping("/test")
+@RequestMapping("api/test")
 public class TestController {
 
     @Autowired
     private HDFSService hdfsService;
 
-    @PostMapping("/upload")
+    @PostMapping("upload")
     public String upload(@RequestParam("file") MultipartFile file) throws Exception {
         boolean flag = this.hdfsService.upload(file.getOriginalFilename(), file.getInputStream());
         if (flag) {
@@ -31,7 +31,7 @@ public class TestController {
         return "/index";
     }
 
-    @GetMapping("/download")
+    @GetMapping("download")
     public ResponseEntity<byte[]> download(HttpServletRequest request)
             throws Exception {
         String fileName = request.getParameter("fileName");
