@@ -10,6 +10,7 @@ import com.stu.yun.responseModel.JsonResponse;
 import com.stu.yun.responseModel.UploadCheckRes;
 import com.stu.yun.service.HDFSService;
 import com.stu.yun.service.RealFileService;
+import com.stu.yun.service.UserService;
 import com.stu.yun.service.VirtualFileService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/file")
@@ -41,18 +43,22 @@ public class FileController {
     @Autowired
     private RealFileService realFileService;
 
-    private static final String HDFS_FilePath_Base ="/epan-hdfs/";
+    @Autowired
+    private UserService userService;
+
+    private static final String HDFS_FilePath_Base = "/epan-hdfs/";
 
     /**
      * 当前登录用户 文件列表
+     *
      * @param session
      * @param fileParentId 当前要查看的 虚拟文件父级ID, 查看根目录则为 null/0
      * @return
      */
     @GetMapping("list")
-    public JsonResponse list(HttpSession session, Integer fileParentId){
+    public JsonResponse list(HttpSession session, Integer fileParentId) {
         // 1. 获取当前登录用户
-        UserInfo currentUser = (UserInfo)session.getAttribute("user");
+        UserInfo currentUser = (UserInfo) session.getAttribute("user");
 
         // 2. 获取 虚拟文件目录
         List<VirtualFile> virtualFileList = this.virtualFileService.userList(currentUser.getId(), fileParentId);
@@ -89,14 +95,15 @@ public class FileController {
 
     /**
      * 文件上传检查: 秒传: 通过接收客户端计算的文件MD5，判断是否需要上传到服务端
+     *
      * @return
      */
     @PostMapping("uploadCheck")
-    public JsonResponse uploadCheck(HttpSession session, @RequestBody UploadCheckReq inputModel){
+    public JsonResponse uploadCheck(HttpSession session, @RequestBody UploadCheckReq inputModel) {
         JsonResponse response = new JsonResponse();
         try {
             // 1. 获取当前登录用户
-            UserInfo currentUser = (UserInfo)session.getAttribute("user");
+            UserInfo currentUser = (UserInfo) session.getAttribute("user");
 
             // 2. 秒传检验
             // 2.1 接收客户端计算的文件MD5
@@ -113,7 +120,7 @@ public class FileController {
                 virtualFile.setRealFileId(realFile.getId());
 
                 boolean isSuccess = this.virtualFileService.insert(virtualFile);
-                if (!isSuccess){
+                if (!isSuccess) {
                     response.setCode(-2);
                     response.setMessage("秒传失败");
                     UploadCheckRes uploadCheckRes = new UploadCheckRes();
@@ -145,25 +152,85 @@ public class FileController {
     }
 
     @PostMapping("upload")
-    public String upload(HttpSession session, @RequestParam("file") MultipartFile file, @RequestParam("fileSignKey") String fileSignKey)
+    public JsonResponse upload(HttpSession session, @RequestParam("file") MultipartFile file, @RequestParam("fileSignKey") String fileSignKey, int fileParentId)
             throws Exception {
-        // TODO: 1. 上传文件
-        // 注意: 抵达此处，说明文件不存在于服务端，这里相信客户端计算结果，不再上传到服务端后，再次计算文件MD5, 而是直接上传
-        // 1.1 接收文件上传
-        // 1.2 insert RealFile
-        // 1.3 insert VirtualFile
-        // 1.4 update UserInfo.usedDiskSize
-        // 1.5 响应 普通上传成功
-        boolean flag = this.hdfsService.upload(HDFS_FilePath_Base + file.getOriginalFilename(), file.getInputStream());
-        if (flag) {
-            System.out.println("start insert into db .....");
+        JsonResponse response = new JsonResponse();
+        try {
+            // 1. 获取当前登录用户
+            UserInfo currentUser = (UserInfo) session.getAttribute("user");
+
+            // 2. 上传文件
+            // 注意: 抵达此处，说明文件不存在于服务端，这里相信客户端计算结果，不再上传到服务端后，再次计算文件MD5, 而是直接上传
+            // 2.1 接收文件上传
+            String fullFilePath = HDFS_FilePath_Base;
+            // 使用 日期作为 目录
+            SimpleDateFormat dfTime = new SimpleDateFormat("yyyy/MM/dd/");
+            fullFilePath += dfTime.format(new Date());
+            // uuid 作为文件名
+            fullFilePath += UUID.randomUUID().toString();
+            boolean isSuccess = this.hdfsService.upload(fullFilePath, file.getInputStream());
+            if (!isSuccess) {
+                response.setCode(-1);
+                response.setMessage("上传失败: 上传文件");
+
+                return response;
+            }
+
+            // 2.2 insert RealFile
+            RealFile realFile = new RealFile();
+            realFile.setSourceType(0);
+            realFile.setFilePath(fullFilePath);
+            realFile.setSignKey(fileSignKey);
+            // TODO: 获取上传文件的大小 (Byte)
+            Long fileSizeByte = file.getSize();
+            realFile.setFileSize(fileSizeByte);
+
+            isSuccess = this.realFileService.insert(realFile);
+            if (!isSuccess) {
+                response.setCode(-3);
+                response.setMessage("上传失败: insert realFile");
+
+                return response;
+            }
+
+            // 2.3 insert VirtualFile
+            // 使用 用户上传的文件名 作为 虚拟文件名
+            String fileName = file.getOriginalFilename();
+            VirtualFile virtualFile = new VirtualFile();
+            virtualFile.setRealFileId(realFile.getId());
+            virtualFile.setUserInfoId(currentUser.getId());
+            virtualFile.setParentId(fileParentId);
+            virtualFile.setFileType(0);
+            virtualFile.setFileName(fileName);
+            virtualFile.setCreateTime(new Date());
+            isSuccess = this.virtualFileService.insert(virtualFile);
+            if (!isSuccess) {
+                response.setCode(-4);
+                response.setMessage("上传失败: insert virtualFile");
+
+                return response;
+            }
+
+            // 2.4 update UserInfo.usedDiskSize
+            Long usedDiskSize = currentUser.getUsedDiskSize();
+            usedDiskSize += realFile.getFileSize();
+            isSuccess = this.userService.update(currentUser);
+
+            // 2.5 响应 普通上传成功
+            response.setCode(1);
+            response.setMessage("普通上传成功");
+
+        } catch (Exception e) {
+            response.setCode(-2);
+            response.setMessage("失败: " + e.getMessage());
         }
 
-        return "/index";
+        return response;
     }
 
     /**
      * 下载文件
+     *
      * @param fileId 虚拟文件ID
      * @return
      * @throws Exception
@@ -184,6 +251,18 @@ public class FileController {
         headers.setContentDispositionFormData("attachment", URLEncoder.encode(filePath, "UTF-8"));
         return new ResponseEntity<byte[]>(IOUtils.toByteArray(inputStream), headers, HttpStatus.OK);
     }
-    
+
+
+    @PostMapping("mkdir")
+    public JsonResponse MkDir(HttpSession session, String folderName, String fileParentId){
+        JsonResponse response = new JsonResponse();
+        try {
+
+        } catch (Exception e) {
+
+        }
+
+        return response;
+    }
 
 }

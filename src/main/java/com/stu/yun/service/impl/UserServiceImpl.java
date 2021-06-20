@@ -27,4 +27,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public boolean update(UserInfo userInfo) {
+        return this.userDao.update(userInfo) == 1;
+    }
+
 }

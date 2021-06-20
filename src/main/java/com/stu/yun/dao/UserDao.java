@@ -10,4 +10,6 @@ public interface UserDao {
     UserInfo queryByUserName(String userName);
 
     int insert(UserInfo userInfo);
+
+    int update(UserInfo userInfo);
 }

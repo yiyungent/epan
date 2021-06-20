@@ -18,6 +18,15 @@
         where userName = #{userName}
     </select>
 
+    <update id="update" parameterType="com.stu.yun.model.UserInfo">
+        update
+            userInfo
+        set
+            usedDiskSize = #{usedDiskSize}
+        where
+            id = #{id}
+    </update>
+
     <insert id="insert" parameterType="com.stu.yun.model.UserInfo" keyProperty="id" useGeneratedKeys="true">
         insert into
             userInfo(id, userName, password, diskSize, usedDiskSize)

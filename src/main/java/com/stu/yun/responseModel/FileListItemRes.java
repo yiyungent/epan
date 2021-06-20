@@ -9,6 +9,9 @@ public class FileListItemRes {
 
     /**
      * Byte
+     * TODO: 文件大小
+     * 1. 普通文件: 对应真实文件大小
+     * 2. 文件夹: 这个文件夹下 所有文件大小之和 (实时计算, 不单独查看时不计算, 即为文件夹时, 此项为 null)
      */
     private Long fileSize;
 

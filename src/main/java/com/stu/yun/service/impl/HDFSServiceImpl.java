@@ -53,10 +53,10 @@ public class HDFSServiceImpl implements HDFSService {
     }
 
     @Override
-    public InputStream download(String path) {
+    public InputStream download(String filePath) {
         FSDataInputStream fis = null;
         try {
-            fis = this.getFileSystem().open(new Path(path));
+            fis = this.getFileSystem().open(new Path(filePath));
         } catch (Exception e) {
             System.out.println("HDFS: download: " + e.getMessage());
         }
