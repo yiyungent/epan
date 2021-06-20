@@ -4,10 +4,7 @@ import com.stu.yun.model.RealFile;
 import com.stu.yun.model.UserInfo;
 import com.stu.yun.model.VirtualFile;
 import com.stu.yun.requestModel.UploadCheckReq;
-import com.stu.yun.responseModel.FileListItemRes;
-import com.stu.yun.responseModel.FileListRes;
-import com.stu.yun.responseModel.JsonResponse;
-import com.stu.yun.responseModel.UploadCheckRes;
+import com.stu.yun.responseModel.*;
 import com.stu.yun.service.HDFSService;
 import com.stu.yun.service.RealFileService;
 import com.stu.yun.service.UserService;
@@ -25,10 +22,7 @@ import javax.servlet.http.HttpSession;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/file")
@@ -219,6 +213,14 @@ public class FileController {
             // 2.5 响应 普通上传成功
             response.setCode(1);
             response.setMessage("普通上传成功");
+            UploadRes uploadRes = new UploadRes();
+            uploadRes.setFileId(virtualFile.getId());
+            uploadRes.setFileName(virtualFile.getFileName());
+            uploadRes.setFileSize(realFile.getFileSize());
+            SimpleDateFormat sformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            uploadRes.setCreateTime(sformat.format(virtualFile.getCreateTime()));
+
+            response.setData(uploadRes);
 
         } catch (Exception e) {
             response.setCode(-2);
@@ -230,39 +232,155 @@ public class FileController {
 
     /**
      * 下载文件
+     * 注意: 只能下载普通文件, 不能下载文件夹
      *
      * @param fileId 虚拟文件ID
      * @return
      * @throws Exception
      */
     @GetMapping("download")
-    public ResponseEntity<byte[]> download(HttpSession session, String fileId)
+    public ResponseEntity<byte[]> download(HttpSession session, int fileId)
             throws Exception {
-        // TODO: 1. 下载文件
+        // 1. 获取当前登录用户
+        UserInfo currentUser = (UserInfo) session.getAttribute("user");
         // TODO: 效验文件权限: 此 VirtualFile 是否属于 当前用户
-        // 1.1 select VirtualFile: 根据 fileId 查询
-        // 1.2 select RealFile: 查询到对应的 RealFile.filePath 真实文件路径
-        // 1.3 读取 filePath 的文件 -> 响应 文件流
 
-        String filePath = "";
-        InputStream inputStream = this.hdfsService.download(HDFS_FilePath_Base + filePath); // /hdfs/Linux.txt
+        // 2. 下载文件
+        // 2.1 select VirtualFile: 根据 fileId 查询
+        VirtualFile virtualFile = this.virtualFileService.queryById(fileId);
+        // 2.2 select RealFile: 查询到对应的 RealFile.filePath 真实文件路径
+        String filePath = virtualFile.getRealFile().getFilePath();
+        // 2.3 读取 filePath 的文件 -> 响应 文件流
+        InputStream inputStream = this.hdfsService.download(filePath);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("attachment", URLEncoder.encode(filePath, "UTF-8"));
+
         return new ResponseEntity<byte[]>(IOUtils.toByteArray(inputStream), headers, HttpStatus.OK);
     }
 
 
     @PostMapping("mkdir")
-    public JsonResponse MkDir(HttpSession session, String folderName, String fileParentId){
+    public JsonResponse mkDir(HttpSession session, String folderName, int fileParentId) {
         JsonResponse response = new JsonResponse();
         try {
+            // 1. 获取当前登录用户
+            UserInfo currentUser = (UserInfo) session.getAttribute("user");
+            // TODO: 效验文件权限: 此 VirtualFile 是否属于 当前用户
+
+            // 2. 创建文件夹
+            // insert VirtualFile
+            VirtualFile virtualFile = new VirtualFile();
+            virtualFile.setCreateTime(new Date());
+            virtualFile.setFileName(folderName);
+            virtualFile.setFileType(1);
+            virtualFile.setParentId(fileParentId);
+            virtualFile.setUserInfoId(currentUser.getId());
+            virtualFile.setRealFileId(0);
+            boolean isSuccess = this.virtualFileService.insert(virtualFile);
+            if (!isSuccess) {
+                response.setCode(-2);
+                response.setMessage("创建文件夹 失败: insert VirtualFile");
+
+                return response;
+            }
+
+            response.setCode(1);
+            response.setMessage("创建文件夹 成功");
+            // 返回 虚拟文件ID
+            response.setData(virtualFile.getId());
 
         } catch (Exception e) {
-
+            response.setCode(-1);
+            response.setMessage("创建文件夹 失败: " + e.getMessage());
         }
 
         return response;
     }
+
+    /**
+     * 删除文件
+     * 1.单个普通文件
+     * 2.文件夹: 及其内部所有文件
+     *
+     * @param session
+     * @param fileId
+     * @return
+     */
+    @PostMapping("delete")
+    public JsonResponse delete(HttpSession session, int fileId) {
+        // TODO: 删除操作 当文件夹内文件较多时，较为耗时，应改为后台运行任务
+        JsonResponse response = new JsonResponse();
+        try {
+            // 1. 获取当前登录用户
+            UserInfo currentUser = (UserInfo) session.getAttribute("user");
+            // TODO: 效验文件权限: 此 VirtualFile 是否属于 当前用户
+
+            // 2. 删除文件
+            deleteDir(fileId);
+
+        } catch (Exception e) {
+            response.setCode(-1);
+            response.setMessage("删除文件 失败: " + e.getMessage());
+        }
+
+        return response;
+    }
+
+    /**
+     * 删除文件
+     * 1. 单个普通文件
+     * 2.文件夹: 及其内部所有文件
+     * 递归删除 文件夹及其内部所有文件
+     *
+     * @param fileId
+     * @return
+     */
+    private void deleteDir(int fileId){
+        VirtualFile virtualFile = this.virtualFileService.queryById(fileId);
+        if (virtualFile.getFileType() == 0) {
+            // 单个普通文件
+            deleteSingleFile(fileId);
+        } else if (virtualFile.getFileType() == 1) {
+            // 文件夹
+            // 该文件夹的 第一级
+            List<VirtualFile> virtualFileList = this.virtualFileService.queryByParentId(fileId);
+            for (VirtualFile item : virtualFileList) {
+                deleteDir(item.getId());
+            }
+            deleteSingleFile(fileId);
+        }
+    }
+
+    /**
+     * 删除单个普通文件
+     *
+     * @param fileId 虚拟文件ID
+     * @return
+     */
+    private boolean deleteSingleFile(int fileId) {
+        boolean isSuccess = true;
+        VirtualFile virtualFile = this.virtualFileService.queryById(fileId);
+        if (virtualFile.getFileType() == 0) {
+            // 先取出 VirtualFile.RealFile
+            RealFile realFile = virtualFile.getRealFile();
+            // 1. delete VirtualFile
+            isSuccess = this.virtualFileService.deleteById(fileId);
+            if (!isSuccess) {
+                return false;
+            }
+            // TODO: Temp: 只要虚拟文件删除成功 (用户看不到了), 则认为删除成功, 完善的话, 这里需要做事务控制
+            // 2 删除后, 若 无 VirtualFile.RealFileId == realFileId,
+            // 即 真实文件不再被引用, 则  1.物理删除真实文件位置 2.delete RealFile
+            isSuccess = this.hdfsService.delete(realFile.getFilePath());
+            isSuccess = this.realFileService.deleteById(realFile.getId());
+
+        } else {
+            isSuccess = false;
+        }
+
+        return isSuccess;
+    }
+
 
 }

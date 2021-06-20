@@ -23,7 +23,10 @@ public class RealFileServiceImpl  implements RealFileService {
         return this.realFileDao.queryBySignKey(signKey);
     }
 
-
+    @Override
+    public boolean deleteById(int id) {
+        return this.realFileDao.deleteById(id) == 1;
+    }
 
 
 }

@@ -12,4 +12,10 @@ public interface VirtualFileDao {
     int insert(VirtualFile virtualFile);
 
     List<VirtualFile> userList(int userId, Integer fileParentId);
+
+    VirtualFile queryById(int id);
+
+    int deleteById(int id);
+
+    List<VirtualFile> queryByParentId(int parentId);
 }

@@ -26,4 +26,10 @@
             (#{id}, #{signKey}, #{sourceType}, #{filePath}, #{fileSize})
     </insert>
 
+    <delete id="deleteById">
+        delete from realFile
+        where
+            id = #{id}
+    </delete>
+
 </mapper>

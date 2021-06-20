@@ -43,11 +43,51 @@
             userInfoId = #{userId} and parentId = #{fileParentId}
     </select>
 
+    <select id="queryById" resultMap="virtualFileMap">
+        select
+            v.id, v.parentId, v.fileType, v.fileName, v.userInfoId, v.realFileId, v.createTime,
+            u.userName, u.password, u.diskSize, u.usedDiskSize,
+            r.signKey, r.sourceType, r.filePath, r.fileSize
+        from
+            virtualFile as v
+        left join
+            userInfo as u
+            on v.userInfoId = u.id
+        left join
+            realFile as r
+            on v.realFileId = r.id
+        where
+            v.id = #{id}
+    </select>
+
+    <select id="queryByParentId" resultMap="virtualFileMap">
+        select
+            v.id, v.parentId, v.fileType, v.fileName, v.userInfoId, v.realFileId, v.createTime,
+            u.userName, u.password, u.diskSize, u.usedDiskSize,
+            r.signKey, r.sourceType, r.filePath, r.fileSize
+        from
+            virtualFile as v
+        left join
+            userInfo as u
+            on v.userInfoId = u.id
+        left join
+            realFile as r
+            on v.realFileId = r.id
+        where
+            v.parentId = #{parentId}
+    </select>
+
     <insert id="insert" parameterType="com.stu.yun.model.VirtualFile" keyProperty="id" useGeneratedKeys="true">
         insert into
             virtualFile(id, parentId, fileType, fileName, userInfoId, realFileId, createTime)
         values
             (#{id}, #{parentId}, #{fileType}, #{fileName}, #{userInfoId}, #{realFileId}, #{createTime})
     </insert>
+
+    <delete id="deleteById">
+        delete from virtualFile
+        where
+            id = #{id}
+    </delete>
 
 </mapper>

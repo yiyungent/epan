@@ -10,4 +10,6 @@ public interface RealFileDao {
     int insert(RealFile realFile);
 
     RealFile queryBySignKey(String signKey);
+
+    int deleteById(int id);
 }

@@ -8,4 +8,5 @@ public interface HDFSService {
 
     InputStream download(String filePath);
 
+    boolean delete(String filePath);
 }

@@ -9,4 +9,10 @@ public interface VirtualFileService {
     boolean insert(VirtualFile virtualFile);
 
     List<VirtualFile> userList(int userId, Integer fileParentId);
+
+    VirtualFile queryById(int id);
+
+    boolean deleteById(int id);
+
+    List<VirtualFile> queryByParentId(int parentId);
 }

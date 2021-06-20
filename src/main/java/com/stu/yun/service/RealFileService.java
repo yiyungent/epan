@@ -7,4 +7,6 @@ public interface RealFileService {
     boolean insert(RealFile realFile);
 
     RealFile queryBySignKey(String signKey);
+
+    boolean deleteById(int id);
 }

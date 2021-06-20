@@ -23,4 +23,19 @@ public class VirtualFileServiceImpl implements VirtualFileService {
     public List<VirtualFile> userList(int userId, Integer fileParentId) {
         return this.virtualFileDao.userList(userId, fileParentId);
     }
+
+    @Override
+    public VirtualFile queryById(int id) {
+        return this.virtualFileDao.queryById(id);
+    }
+
+    @Override
+    public boolean deleteById(int id) {
+        return this.virtualFileDao.deleteById(id) == 1;
+    }
+
+    @Override
+    public List<VirtualFile> queryByParentId(int parentId) {
+        return this.virtualFileDao.queryByParentId(parentId);
+    }
 }

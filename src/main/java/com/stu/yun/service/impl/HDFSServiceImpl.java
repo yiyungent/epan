@@ -66,4 +66,9 @@ public class HDFSServiceImpl implements HDFSService {
         return fis;
     }
 
+    @Override
+    public boolean delete(String filePath) {
+        return false;
+    }
+
 }
