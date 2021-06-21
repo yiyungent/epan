@@ -21,4 +21,6 @@ public interface VirtualFileService {
     int queryFileIdByPath(int userId, String path);
 
     boolean mkdir(int userId, String path);
+
+    List<VirtualFile> queryByRealFileId(int realFileId);
 }

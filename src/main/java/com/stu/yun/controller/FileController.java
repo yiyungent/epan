@@ -356,11 +356,10 @@ public class FileController {
      * 2.文件夹: 及其内部所有文件
      *
      * @param session
-     * @param fileId
      * @return
      */
-    @PostMapping("delete")
-    public JsonResponse delete(HttpSession session, int fileId) {
+    @GetMapping("delete")
+    public JsonResponse delete(HttpSession session, String path, String fileName) {
         // TODO: 删除操作 当文件夹内文件较多时，较为耗时，应改为后台运行任务
         JsonResponse response = new JsonResponse();
         try {
@@ -369,7 +368,25 @@ public class FileController {
             // TODO: 效验文件权限: 此 VirtualFile 是否属于 当前用户
 
             // 2. 删除文件
+            // folderId 为0 时，即根目录
+            int folderId = this.virtualFileService.queryFileIdByPath(currentUser.getId(), path);
+            // TODO: 优化: 可以不需要遍历, 而是写SQL查出
+            // 此文件夹下所有文件
+            List<VirtualFile> virtualFileList = this.virtualFileService.queryByParentId(folderId);
+            int fileId = 0;
+            // 寻找此文件夹下 目标文件
+            for (VirtualFile item : virtualFileList) {
+                if (item.getFileName().equals(fileName)) {
+                    // 不管目标是 普通文件 还是 文件夹, 都可进行删除
+                    fileId = item.getId();
+                    break;
+                }
+            }
+
             deleteDir(fileId);
+
+            response.setCode(1);
+            response.setMessage("删除文件 成功");
 
         } catch (Exception e) {
             response.setCode(-1);
@@ -401,7 +418,8 @@ public class FileController {
             for (VirtualFile item : virtualFileList) {
                 deleteDir(item.getId());
             }
-            deleteSingleFile(fileId);
+            // 此时文件夹内部 已空: 删除 空文件夹
+            this.virtualFileService.deleteById(fileId);
         }
     }
 
@@ -425,8 +443,11 @@ public class FileController {
             // TODO: Temp: 只要虚拟文件删除成功 (用户看不到了), 则认为删除成功, 完善的话, 这里需要做事务控制
             // 2 删除后, 若 无 VirtualFile.RealFileId == realFileId,
             // 即 真实文件不再被引用, 则  1.物理删除真实文件位置 2.delete RealFile
-            isSuccess = this.hdfsService.delete(realFile.getFilePath());
-            isSuccess = this.realFileService.deleteById(realFile.getId());
+            List<VirtualFile> list = this.virtualFileService.queryByRealFileId(realFile.getId());
+            if (list == null || list.isEmpty()) {
+                isSuccess = this.hdfsService.delete(realFile.getFilePath());
+                isSuccess = this.realFileService.deleteById(realFile.getId());
+            }
 
         } else {
             isSuccess = false;

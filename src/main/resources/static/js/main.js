@@ -77,7 +77,7 @@ function mkdir() {
     let reqUrl = httpAddr+"/api/file/mkdir?path="+pathDom.value+"/"+input.value;
     util.httpGet(reqUrl,function (res) {
         refresh();
-        if (res.code==1) {
+        if (res.code == 1) {
             showTips("成功",2000);
         }else {
             showTips(res.message,2000)
@@ -93,10 +93,10 @@ function fileDelete() {
     let chk_list = document.getElementsByName("checkbox");
     for(let i=0;i<chk_list.length;i++){
         if (chk_list[i].checked) {
-            let reqUrl = util.format("{0}delete?path={1}&filename={2}",httpAddr,pathDom.value,chk_list[i].value);
+            let reqUrl = util.format("{0}/api/file/delete?path={1}&fileName={2}",httpAddr,pathDom.value,chk_list[i].value);
             console.log(reqUrl);
             util.httpGet(reqUrl, function (res) {
-                if (res.ok) {
+                if (res.code == 1) {
                     showTips("成功", 2000);
                     refresh();
                 } else {

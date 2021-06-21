@@ -20,4 +20,6 @@ public interface VirtualFileDao {
     List<VirtualFile> queryByParentId(int parentId);
 
     VirtualFile queryByPath(int userId, String fileName, int parentId);
+
+    List<VirtualFile> queryByRealFileId(int realFileId);
 }
