@@ -4,9 +4,7 @@ import com.stu.yun.model.UserInfo;
 import com.stu.yun.responseModel.JsonResponse;
 import com.stu.yun.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
@@ -57,6 +55,24 @@ public class UserController {
             response.setCode(-1);
             response.setMessage("注册失败");
         }
+
+        return response;
+    }
+
+    @GetMapping("info")
+    public JsonResponse info(@SessionAttribute("user") UserInfo user){
+        JsonResponse response = new JsonResponse();
+        if (user == null) {
+            response.setCode(-1);
+            response.setMessage("未登录");
+            return response;
+        }
+        response.setCode(1);
+        response.setMessage("已登录");
+        // TODO: user responseModel
+        // Temp: 敏感数据置空
+        user.setPassword("");
+        response.setData(user);
 
         return response;
     }
