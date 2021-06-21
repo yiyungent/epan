@@ -10,6 +10,8 @@ window.onload = function() {
         if (res.code == 1) {
             // 已登录
             util.setCookie("user", JSON.stringify(res.data), 7);
+            $("#js-btn-exit").html(util.format($("#js-btn-exit").html(), res.data.userName));
+
         } else if(res.code == -1) {
             // 未登录
             window.location.href = "/login";

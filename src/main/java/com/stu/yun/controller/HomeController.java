@@ -4,6 +4,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpSession;
+
 @Controller
 @RequestMapping("/")
 public class HomeController {
@@ -17,6 +19,13 @@ public class HomeController {
     @GetMapping("register")
     public String register() {
         return "register.html";
+    }
+
+    @GetMapping("exit")
+    public String exit(HttpSession session) {
+        session.setAttribute("user", null);
+
+        return "login.html";
     }
 
     @GetMapping("/")
