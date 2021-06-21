@@ -216,14 +216,14 @@ function fileGet(path) {
                     str += util.format(tmp,data.fileName,folder,"-","-","dir")
                 }else {
                     let file = util.format(`<i class="fa fa-file-o"></i><span>&nbsp;&nbsp;{0}</span>`,data.fileName);
-                    str += util.format(tmp,data.fileName,file,util.b2string(data.fileSize,1000),data.createTime,"file")
+                    str += util.format(tmp,data.fileName,file,util.b2string(data.fileSize,1024),data.createTime,"file")
                 }
             }
             list.innerHTML = str;
             // 获取用户信息
             let user = JSON.parse(util.getCookie("user"));
             // 文件容量
-            disk_info.innerHTML = util.format("{0}/{1}&nbsp;",util.b2string(user.usedDiskSize,1000),util.b2string(user.diskSize,1000))
+            disk_info.innerHTML = util.format("{0}/{1}&nbsp;",util.b2string(user.usedDiskSize,1024),util.b2string(user.diskSize,1024))
             // TODO: 文件容量 百分比
             // disk_p.innerHTML = util.format("{0}%",res.disk_used_p.toFixed(1));
             // disk_p.style.width = util.format("{0}%",res.disk_used_p.toFixed(1));
@@ -307,7 +307,7 @@ function updateFile(path,file) {
         document.getElementById('update-info').style.display = "block";
         if (!updateInfos.has(fileAbs)) {
             let list = document.getElementById('update-list');
-            let pSize = util.b2string(totalSize,1000);
+            let pSize = util.b2string(totalSize,1024);
             let index = path.lastIndexOf("\/");
             let pPath = path.substring(index+1,path.length);
             let pWidth = util.format("{0}-width",fileAbs);
