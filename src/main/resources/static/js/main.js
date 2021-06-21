@@ -74,10 +74,10 @@ function mkdir() {
         return;
     }
 
-    let reqUrl = httpAddr+"mkdir?path="+pathDom.value+"/"+input.value;
+    let reqUrl = httpAddr+"/api/file/mkdir?path="+pathDom.value+"/"+input.value;
     util.httpGet(reqUrl,function (res) {
         refresh();
-        if (res.ok) {
+        if (res.code==1) {
             showTips("成功",2000);
         }else {
             showTips(res.message,2000)

@@ -19,4 +19,6 @@ public interface VirtualFileService {
     List<VirtualFile> queryByParentId(int parentId);
 
     int queryFileIdByPath(int userId, String path);
+
+    boolean mkdir(int userId, String path);
 }

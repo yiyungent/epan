@@ -310,8 +310,8 @@ public class FileController {
     }
 
 
-    @PostMapping("mkdir")
-    public JsonResponse mkDir(HttpSession session, String folderName, int fileParentId) {
+    @GetMapping("mkdir")
+    public JsonResponse mkDir(HttpSession session, String path) {
         JsonResponse response = new JsonResponse();
         try {
             // 1. 获取当前登录用户
@@ -319,15 +319,7 @@ public class FileController {
             // TODO: 效验文件权限: 此 VirtualFile 是否属于 当前用户
 
             // 2. 创建文件夹
-            // insert VirtualFile
-            VirtualFile virtualFile = new VirtualFile();
-            virtualFile.setCreateTime(new Date());
-            virtualFile.setFileName(folderName);
-            virtualFile.setFileType(1);
-            virtualFile.setParentId(fileParentId);
-            virtualFile.setUserInfoId(currentUser.getId());
-            virtualFile.setRealFileId(0);
-            boolean isSuccess = this.virtualFileService.insert(virtualFile);
+            boolean isSuccess = this.virtualFileService.mkdir(currentUser.getId(), path);
             if (!isSuccess) {
                 response.setCode(-2);
                 response.setMessage("创建文件夹 失败: insert VirtualFile");
@@ -337,8 +329,8 @@ public class FileController {
 
             response.setCode(1);
             response.setMessage("创建文件夹 成功");
-            // 返回 虚拟文件ID
-            response.setData(virtualFile.getId());
+            // TODO: 返回 虚拟文件ID, 由于可以通过 path 同时创建多个文件夹，所以 不再返回
+//            response.setData(virtualFile.getId());
 
         } catch (Exception e) {
             response.setCode(-1);

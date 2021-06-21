@@ -6,6 +6,7 @@ import com.stu.yun.service.VirtualFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -31,7 +32,7 @@ public class VirtualFileServiceImpl implements VirtualFileService {
         // TODO: 注意: 这里可能存在空字符串, 添加 -1 也没用
         String[] folderNameArr = path.split("/");
 
-        System.out.println("folderNameArr:  " + folderNameArr.length + " " + String.join(",", folderNameArr));
+        System.out.println("userList.folderNameArr:  " + folderNameArr.length + " " + String.join(",", folderNameArr));
         int tempFileParentId = 0;
         for (int i = 0; i < folderNameArr.length; i++) {
             if (folderNameArr[i].isEmpty()){
@@ -72,7 +73,7 @@ public class VirtualFileServiceImpl implements VirtualFileService {
         // TODO: 注意: 这里可能存在空字符串, 添加 -1 也没用
         String[] folderNameArr = path.split("/");
 
-        System.out.println("folderNameArr:  " + folderNameArr.length + " " + String.join(",", folderNameArr));
+        System.out.println("queryFileIdByPath.folderNameArr:  " + folderNameArr.length + " " + String.join(",", folderNameArr));
         int tempFileParentId = 0;
         for (int i = 0; i < folderNameArr.length; i++) {
             if (folderNameArr[i].isEmpty()){
@@ -88,5 +89,44 @@ public class VirtualFileServiceImpl implements VirtualFileService {
         }
 
         return tempFileParentId;
+    }
+
+    @Override
+    public boolean mkdir(int userId, String path) {
+        boolean isSuccess = true;
+        // path: 文件夹a/文件夹b/文件夹c, 不存在普通文件
+        // 根据路径查询到最后一个文件夹的 fileId
+        // TODO: 注意: 这里可能存在空字符串, 添加 -1 也没用
+        String[] folderNameArr = path.split("/");
+
+        System.out.println("mkdir.folderNameArr:  " + folderNameArr.length + " " + String.join(",", folderNameArr));
+        int tempFileParentId = 0;
+        Date now = new Date();
+        for (int i = 0; i < folderNameArr.length; i++) {
+            if (folderNameArr[i].isEmpty()){
+                continue;
+            }
+            int fileParentId = tempFileParentId;
+            // 此用户 此文件夹下(fileParentId) 此文件夹 folderNameArr[i]
+            VirtualFile virtualFile = this.virtualFileDao.queryByPath(userId, folderNameArr[i], fileParentId);
+            if (virtualFile == null) {
+                // 不存在此文件夹: 新建
+                // insert VirtualFile
+                virtualFile = new VirtualFile();
+                virtualFile.setCreateTime(now);
+                virtualFile.setFileName(folderNameArr[i]);
+                virtualFile.setFileType(1);
+                virtualFile.setParentId(fileParentId);
+                virtualFile.setUserInfoId(userId);
+                virtualFile.setRealFileId(0);
+                this.insert(virtualFile);
+            } else {
+                // 已存在: 什么都不做
+            }
+
+            tempFileParentId = virtualFile.getId();
+        }
+
+        return isSuccess;
     }
 }
