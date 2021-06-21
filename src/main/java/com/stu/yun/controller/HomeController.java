@@ -14,6 +14,11 @@ public class HomeController {
         return "login.html";
     }
 
+    @GetMapping("register")
+    public String register() {
+        return "register.html";
+    }
+
     @GetMapping("/")
     public String index(){
         return "index.html";
