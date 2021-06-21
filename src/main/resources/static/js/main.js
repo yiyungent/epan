@@ -114,7 +114,7 @@ function fileDownload() {
     let chk_list = document.getElementsByName("checkbox");
     for(let i= 0;i<chk_list.length;i++){
         if (chk_list[i].checked) {
-            let reqUrl = util.format("{0}download?path={1}&filename={2}",httpAddr,pathDom.value,chk_list[i].value);
+            let reqUrl = util.format("{0}/api/file/download?path={1}&fileName={2}",httpAddr,pathDom.value,chk_list[i].value);
             let tt = chk_list[i].getAttribute("data");
             if (tt === "file") {
                 // 创建隐藏的可下载链接

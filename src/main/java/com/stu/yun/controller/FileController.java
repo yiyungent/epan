@@ -284,18 +284,28 @@ public class FileController {
      * 下载文件
      * 注意: 只能下载普通文件, 不能下载文件夹
      *
-     * @param fileId 虚拟文件ID
      * @return
      * @throws Exception
      */
     @GetMapping("download")
-    public ResponseEntity<byte[]> download(HttpSession session, int fileId)
+    public ResponseEntity<byte[]> download(HttpSession session, String path, String fileName)
             throws Exception {
         // 1. 获取当前登录用户
         UserInfo currentUser = (UserInfo) session.getAttribute("user");
         // TODO: 效验文件权限: 此 VirtualFile 是否属于 当前用户
 
         // 2. 下载文件
+        int folderId = this.virtualFileService.queryFileIdByPath(currentUser.getId(), path);
+        // 此文件夹下所有文件
+        List<VirtualFile> virtualFileList = this.virtualFileService.queryByParentId(folderId);
+        int fileId = 0;
+        // 寻找此文件夹下 目标文件
+        for (VirtualFile item : virtualFileList) {
+            if (item.getFileName().equals(fileName)&&item.getFileType()==0) {
+                fileId = item.getId();
+                break;
+            }
+        }
         // 2.1 select VirtualFile: 根据 fileId 查询
         VirtualFile virtualFile = this.virtualFileService.queryById(fileId);
         // 2.2 select RealFile: 查询到对应的 RealFile.filePath 真实文件路径
@@ -304,7 +314,7 @@ public class FileController {
         InputStream inputStream = this.hdfsService.download(filePath);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", URLEncoder.encode(filePath, "UTF-8"));
+        headers.setContentDispositionFormData("attachment", URLEncoder.encode(virtualFile.getFileName(), "UTF-8"));
 
         return new ResponseEntity<byte[]>(IOUtils.toByteArray(inputStream), headers, HttpStatus.OK);
     }
