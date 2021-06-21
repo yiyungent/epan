@@ -4,6 +4,18 @@ let pathDom;
 let box;
 
 window.onload = function() {
+
+    // 获取用户信息
+    util.httpGet("/api/user/info", function (res) {
+        if (res.code == 1) {
+            // 已登录
+            util.setCookie("user", JSON.stringify(res.data), 7);
+        } else if(res.code == -1) {
+            // 未登录
+            window.location.href = "/login";
+        }
+    })
+
     if (typeof(Worker) !== "undefined") {
         console.log("浏览器支持HTML5");
     } else {
@@ -48,6 +60,8 @@ window.onload = function() {
         return false;
     };
     refresh()
+
+
 };
 
 function refresh() {

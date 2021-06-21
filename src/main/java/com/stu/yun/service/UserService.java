@@ -9,4 +9,6 @@ public interface UserService {
     UserInfo insert(UserInfo userInfo);
 
     boolean update(UserInfo userInfo);
+
+    UserInfo queryById(int id);
 }

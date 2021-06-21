@@ -60,7 +60,7 @@ public class UserController {
     }
 
     @GetMapping("info")
-    public JsonResponse info(@SessionAttribute("user") UserInfo user){
+    public JsonResponse info(@SessionAttribute("user") UserInfo user, HttpSession session){
         JsonResponse response = new JsonResponse();
         if (user == null) {
             response.setCode(-1);
@@ -69,6 +69,10 @@ public class UserController {
         }
         response.setCode(1);
         response.setMessage("已登录");
+
+        // 更新用户信息
+        user = this.userService.queryById(user.getId());
+        session.setAttribute("user", user);
         // TODO: user responseModel
         // Temp: 敏感数据置空
         user.setPassword("");

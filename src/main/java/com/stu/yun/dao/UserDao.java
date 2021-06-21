@@ -12,4 +12,6 @@ public interface UserDao {
     int insert(UserInfo userInfo);
 
     int update(UserInfo userInfo);
+
+    UserInfo queryById(int id);
 }

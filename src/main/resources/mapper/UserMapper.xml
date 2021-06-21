@@ -18,6 +18,14 @@
         where userName = #{userName}
     </select>
 
+    <select id="queryById" resultType="com.stu.yun.model.UserInfo">
+        select
+            id, userName, password, diskSize, usedDiskSize
+        from
+            userInfo
+        where id = #{id}
+    </select>
+
     <update id="update" parameterType="com.stu.yun.model.UserInfo">
         update
             userInfo

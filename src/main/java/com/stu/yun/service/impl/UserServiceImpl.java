@@ -32,4 +32,9 @@ public class UserServiceImpl implements UserService {
         return this.userDao.update(userInfo) == 1;
     }
 
+    @Override
+    public UserInfo queryById(int id) {
+        return this.userDao.queryById(id);
+    }
+
 }

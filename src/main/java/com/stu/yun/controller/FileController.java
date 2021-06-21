@@ -178,6 +178,10 @@ public class FileController {
                 uploadCheckRes.setFileId(virtualFile.getId());
                 uploadCheckRes.setFileName(virtualFile.getFileName());
                 uploadCheckRes.setFileSignKey(realFile.getSignKey());
+
+                // 更新用户使用容量
+                updateUserUsedDiskSize(realFile.getFileSize(), currentUser.getId());
+
                 response.setData(uploadCheckRes);
             } else {
                 // 2.4 不存在: 响应 客户端 需要 继续普通上传文件 -> upload()
@@ -269,6 +273,9 @@ public class FileController {
             uploadRes.setFileSize(realFile.getFileSize());
             SimpleDateFormat sformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             uploadRes.setCreateTime(sformat.format(virtualFile.getCreateTime()));
+
+            // 更新用户使用容量
+            updateUserUsedDiskSize(realFile.getFileSize(), currentUser.getId());
 
             response.setData(uploadRes);
 
@@ -383,7 +390,7 @@ public class FileController {
                 }
             }
 
-            deleteDir(fileId);
+            deleteDir(fileId, currentUser.getId());
 
             response.setCode(1);
             response.setMessage("删除文件 成功");
@@ -406,17 +413,19 @@ public class FileController {
      * @param fileId
      * @return
      */
-    private void deleteDir(int fileId){
+    private void deleteDir(int fileId, int userId){
         VirtualFile virtualFile = this.virtualFileService.queryById(fileId);
         if (virtualFile.getFileType() == 0) {
             // 单个普通文件
             deleteSingleFile(fileId);
+            // 更新用户使用容量
+            updateUserUsedDiskSize(-virtualFile.getRealFile().getFileSize(), userId);
         } else if (virtualFile.getFileType() == 1) {
             // 文件夹
             // 该文件夹的 第一级
             List<VirtualFile> virtualFileList = this.virtualFileService.queryByParentId(fileId);
             for (VirtualFile item : virtualFileList) {
-                deleteDir(item.getId());
+                deleteDir(item.getId(), userId);
             }
             // 此时文件夹内部 已空: 删除 空文件夹
             this.virtualFileService.deleteById(fileId);
@@ -456,5 +465,19 @@ public class FileController {
         return isSuccess;
     }
 
+    /**
+     * 更新用户使用容量
+     * @param updateSize
+     * @param userId
+     */
+    private void updateUserUsedDiskSize(Long updateSize, int userId){
+        UserInfo user = this.userService.queryById(userId);
+        if (user != null) {
+            Long usedDiskSize = user.getUsedDiskSize();
+            usedDiskSize += updateSize;
+            user.setUsedDiskSize(usedDiskSize);
 
+            this.userService.update(user);
+        }
+    }
 }
