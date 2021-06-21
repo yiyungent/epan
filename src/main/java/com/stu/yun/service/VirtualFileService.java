@@ -10,6 +10,8 @@ public interface VirtualFileService {
 
     List<VirtualFile> userList(int userId, Integer fileParentId);
 
+    List<VirtualFile> userList(int userId, String path);
+
     VirtualFile queryById(int id);
 
     boolean deleteById(int id);

@@ -46,10 +46,55 @@ public class FileController {
      * 当前登录用户 文件列表
      *
      * @param session
-     * @param fileParentId 当前要查看的 虚拟文件父级ID, 查看根目录则为 null/0
+     * @param path 当前文件夹路径: 文件夹a/文件夹b/文件夹c
      * @return
      */
     @GetMapping("list")
+    public JsonResponse list(HttpSession session, String path) {
+        // 1. 获取当前登录用户
+        UserInfo currentUser = (UserInfo) session.getAttribute("user");
+
+        // 2. 获取 虚拟文件目录
+        List<VirtualFile> virtualFileList = this.virtualFileService.userList(currentUser.getId(), path);
+        if (virtualFileList == null) {
+            virtualFileList = new ArrayList<>();
+        }
+        // dbModel -> DTO
+        FileListRes fileList = new FileListRes();
+        List<FileListItemRes> listItemList = new ArrayList<>();
+        SimpleDateFormat sformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        for (VirtualFile virtualFile : virtualFileList) {
+            FileListItemRes item = new FileListItemRes();
+            item.setFileId(virtualFile.getId());
+            item.setFileName(virtualFile.getFileName());
+            item.setCreateTime(sformat.format(virtualFile.getCreateTime()));
+            item.setFileType(virtualFile.getFileType());
+
+            RealFile realFile = virtualFile.getRealFile();
+            item.setFileSize(realFile.getFileSize());
+
+            listItemList.add(item);
+        }
+        // TODO: 使用路径找 代取 fileParentId
+//        fileList.setFileParentId(fileParentId);
+        fileList.setList(listItemList);
+
+        JsonResponse response = new JsonResponse();
+        response.setCode(1);
+        response.setMessage("加载文件列表成功");
+        response.setData(fileList);
+
+        return response;
+    }
+
+    /**
+     * 当前登录用户 文件列表
+     *
+     * @param session
+     * @param fileParentId 当前要查看的 虚拟文件父级ID, 查看根目录则为 null/0
+     * @return
+     */
+//    @GetMapping("list")
     public JsonResponse list(HttpSession session, Integer fileParentId) {
         // 1. 获取当前登录用户
         UserInfo currentUser = (UserInfo) session.getAttribute("user");

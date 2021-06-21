@@ -18,4 +18,6 @@ public interface VirtualFileDao {
     int deleteById(int id);
 
     List<VirtualFile> queryByParentId(int parentId);
+
+    VirtualFile queryByPath(int userId, String fileName, int parentId);
 }
