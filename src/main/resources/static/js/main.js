@@ -239,8 +239,10 @@ function fileGet(path) {
             // 文件容量
             disk_info.innerHTML = util.format("{0}/{1}&nbsp;",util.b2string(user.usedDiskSize,1024),util.b2string(user.diskSize,1024))
             // TODO: 文件容量 百分比
-            // disk_p.innerHTML = util.format("{0}%",res.disk_used_p.toFixed(1));
-            // disk_p.style.width = util.format("{0}%",res.disk_used_p.toFixed(1));
+            let disk_used_p = Number(user.usedDiskSize)/Number(user.diskSize)*100;
+            console.log(disk_used_p);
+            disk_p.innerHTML = util.format("{0}%",disk_used_p.toFixed(1));
+            disk_p.style.width = util.format("{0}%",disk_used_p.toFixed(1));
         } else {
             showTips("请求错误", 1000)
         }
