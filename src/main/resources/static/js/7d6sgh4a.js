@@ -363,11 +363,12 @@ function updateFile(path,file) {
     }
 
     function checkFile(md5,callback) {
-        let reqUrl = httpAddr +"check";
-        let cmd = {path:path,filename:filename,total:total,md5:md5,size:totalSize};
+        // TODO: 文件上传检查
+        let reqUrl = httpAddr +"/api/file/uploadCheck";
+        let cmd = {path:path,fileName:filename,total:total,fileSignKey:md5,size:totalSize};
         util.httpPost(reqUrl,JSON.stringify(cmd), function (res) {
-            if (res.ok){
-                if (res.need){
+            if (res.code > 0){
+                if (res.code == 2){
                     callback(true,res.upload)
                 }else {
                     callback(false)
@@ -390,7 +391,7 @@ function updateFile(path,file) {
                     }
                 }
 
-                let reqUrl = httpAddr +"upload";
+                let reqUrl = httpAddr +"/api/file/upload";
                 let current = 0;
                 while (current < total) {
                     current++;
@@ -404,9 +405,9 @@ function updateFile(path,file) {
                         let fd = new FormData();
                         fd.append('path',path);
                         fd.append('file', blob);
-                        fd.append('filename', filename);
+                        fd.append('fileName', filename);
                         fd.append('current', current.toString());
-                        fd.append('md5', md5);
+                        fd.append('fileSignKey', md5);
 
                         xhr.open("post",reqUrl,true);
                         xhr.onreadystatechange = function () {

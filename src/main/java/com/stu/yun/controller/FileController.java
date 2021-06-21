@@ -154,7 +154,10 @@ public class FileController {
                 virtualFile.setCreateTime(new Date());
                 virtualFile.setFileName(inputModel.getFileName());
                 virtualFile.setFileType(0);
-                virtualFile.setParentId(inputModel.getFileParentId());
+
+                int fileParentId = this.virtualFileService.queryFileIdByPath(currentUser.getId(), inputModel.getPath());
+
+                virtualFile.setParentId(fileParentId);
                 virtualFile.setUserInfoId(currentUser.getId());
                 virtualFile.setRealFileId(realFile.getId());
 
@@ -191,7 +194,7 @@ public class FileController {
     }
 
     @PostMapping("upload")
-    public JsonResponse upload(HttpSession session, @RequestParam("file") MultipartFile file, @RequestParam("fileSignKey") String fileSignKey, int fileParentId)
+    public JsonResponse upload(HttpSession session, @RequestParam("file") MultipartFile file, @RequestParam("fileSignKey") String fileSignKey, String path, String fileName)
             throws Exception {
         JsonResponse response = new JsonResponse();
         try {
@@ -234,11 +237,13 @@ public class FileController {
 
             // 2.3 insert VirtualFile
             // 使用 用户上传的文件名 作为 虚拟文件名
-            String fileName = file.getOriginalFilename();
             VirtualFile virtualFile = new VirtualFile();
             virtualFile.setRealFileId(realFile.getId());
             virtualFile.setUserInfoId(currentUser.getId());
+
+            int fileParentId = this.virtualFileService.queryFileIdByPath(currentUser.getId(), path);
             virtualFile.setParentId(fileParentId);
+
             virtualFile.setFileType(0);
             virtualFile.setFileName(fileName);
             virtualFile.setCreateTime(new Date());

@@ -17,4 +17,6 @@ public interface VirtualFileService {
     boolean deleteById(int id);
 
     List<VirtualFile> queryByParentId(int parentId);
+
+    int queryFileIdByPath(int userId, String path);
 }

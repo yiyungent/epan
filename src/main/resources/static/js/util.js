@@ -14,6 +14,7 @@ util.httpPost = function(url,data,success,error){
         url:url,
         type: "post",
         async: true,
+        contentType: "application/json",
         dataType: "json",
         data:data,
         success: success,

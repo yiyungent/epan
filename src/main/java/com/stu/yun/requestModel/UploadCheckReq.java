@@ -4,9 +4,17 @@ public class UploadCheckReq {
 
     private String fileName;
 
-    private int fileParentId;
+    private String path;
 
     private String fileSignKey;
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 
     public String getFileName() {
         return fileName;
@@ -14,14 +22,6 @@ public class UploadCheckReq {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
-    }
-
-    public int getFileParentId() {
-        return fileParentId;
-    }
-
-    public void setFileParentId(int fileParentId) {
-        this.fileParentId = fileParentId;
     }
 
     public String getFileSignKey() {
