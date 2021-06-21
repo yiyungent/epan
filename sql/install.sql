@@ -27,11 +27,11 @@ CREATE TABLE `realfile` (
   `filePath` varchar(5000) NOT NULL,
   `fileSize` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `realfile` */
 
-insert  into `realfile`(`id`,`signKey`,`sourceType`,`filePath`,`fileSize`) values (1,'dqwfeqr',0,'/epan-hdfs/2021/6/20/dsadd',131323);
+insert  into `realfile`(`id`,`signKey`,`sourceType`,`filePath`,`fileSize`) values (2,'3455bb57e4b4906bbea67b58cca78fa8',0,'/epan-hdfs/2021/06/21/a2f3e266-769f-4d1d-83db-813899913651',214092195);
 
 /*Table structure for table `userinfo` */
 
@@ -44,11 +44,11 @@ CREATE TABLE `userinfo` (
   `diskSize` bigint(20) NOT NULL DEFAULT '0',
   `usedDiskSize` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `userinfo` */
 
-insert  into `userinfo`(`id`,`userName`,`password`,`diskSize`,`usedDiskSize`) values (1,'admin','admin',10737418240,0);
+insert  into `userinfo`(`id`,`userName`,`password`,`diskSize`,`usedDiskSize`) values (1,'admin','admin',10737418240,0),(2,'mike','mike',10737418240,0);
 
 /*Table structure for table `virtualfile` */
 
@@ -61,13 +61,13 @@ CREATE TABLE `virtualfile` (
   `fileName` varchar(2000) NOT NULL,
   `userInfoId` int(11) NOT NULL,
   `realFileId` int(11) NOT NULL DEFAULT '0',
-  `createTime` date NOT NULL,
+  `createTime` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `virtualfile` */
 
-insert  into `virtualfile`(`id`,`parentId`,`fileType`,`fileName`,`userInfoId`,`realFileId`,`createTime`) values (1,0,0,'a.txt',1,1,'2021-06-16'),(2,0,1,'大学',1,0,'2021-06-07'),(3,2,0,'数学.txt',1,1,'2021-06-01');
+insert  into `virtualfile`(`id`,`parentId`,`fileType`,`fileName`,`userInfoId`,`realFileId`,`createTime`) values (5,0,0,'hadoop-2.7.3.tar.gz',1,2,'2021-06-21 06:13:56'),(6,0,1,'hadoop',1,0,'2021-06-21 06:14:18'),(7,6,0,'hadoop-2.7.3.tar.gz',1,2,'2021-06-21 06:14:30');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
