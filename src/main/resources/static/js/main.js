@@ -231,7 +231,7 @@ function fileGet(path) {
                     let folder = util.format(`<a href="#" onclick="fileGet('{1}')" style="text-decoration: none"><i class="fa fa-folder-o"></i><span>&nbsp;&nbsp;{0}</span></a>`,data.fileName,pathDom.value+"/"+data.fileName);
                     str += util.format(tmp,data.fileName,folder,"-",data.createTime,"dir")
                 }else {
-                    let file = util.format(`<i class="fa fa-file-o"></i><span>&nbsp;&nbsp;{0}</span>`,data.fileName);
+                    let file = util.format(`<i class="fa fa-file-o"></i><span onclick="openFile('{1}','{0}')">&nbsp;&nbsp;{0}</span>`,data.fileName,pathDom.value);
                     str += util.format(tmp,data.fileName,file,util.b2string(data.fileSize,1024),data.createTime,"file")
                 }
             }
@@ -252,6 +252,25 @@ function fileGet(path) {
         console.log(11,e);
         showTips("网络错误！",1000)
     });
+}
+
+function openFile(path, fileName) {
+    let reqUrl = util.format("{0}/api/file/download?path={1}&fileName={2}",httpAddr,path,fileName);
+    let suffixIndex = fileName.lastIndexOf(".");
+    let fileSuffix = fileName.substr(suffixIndex+1);
+    console.log("打开文件: " + reqUrl);
+    if (["mp3"].indexOf(fileSuffix)>=0) {
+        console.log("音频播放: " + reqUrl);
+        // 音频 播放
+        // ap.list.add([{
+        //     name: fileName,
+        //     // artist: 'artist',
+        //     url: reqUrl,
+        //     // cover: 'cover.jpg',
+        //     fixed: true,
+        //     // mini: true
+        // }]);
+    }
 }
 
 /************* 文件上传 ***************/
