@@ -1,27 +1,45 @@
 var util = {};
+
+// post 方式发送, 内容以 queryString 格式组织: ?a=2&b=3 添加到url?后, 最终整个 url 是经过编码的
 util.httpGet = function(url,success,error){
     $.ajax({
         url:url,
         type: "get",
-        async: true,
+        async: true, // 异步: true
         success: success,
         error: error
     });
 };
 
+// post 方式发送, 内容以 json 格式组织: {a:1,b:2} 放于 请求体
 util.httpPost = function(url,data,success,error){
     $.ajax({
         url:url,
         type: "post",
         async: true,
-        contentType: "application/json",
-        dataType: "json",
+        contentType: "application/json", // 发送的内容 的数据格式类型
+        dataType: "json", // 预期服务器返回的数据格式类型, 如果不指定, jQuery 将自动根据 HTTP 包 MIME 信息来智能判断
         data:data,
         success: success,
         error: error
     });
 };
 
+// post 方式发送, 内容以 form-data 格式组织: a=1&b=c 放于 请求体
+util.httpPostForm = function(url,data,success,error){
+    $.ajax({
+        url:url,
+        type: "post",
+        async: true,
+        contentType: "application/json", // 发送的内容 的数据格式类型
+        dataType: "json", // 预期服务器返回的数据格式类型, 如果不指定, jQuery 将自动根据 HTTP 包 MIME 信息来智能判断
+        data:data,
+        success: success,
+        error: error
+    });
+};
+
+// post 方式发送, 内容以 form-data 格式组织: a=1&b=c 放于 请求体, contentType 为自动计算，用于多部分文件上传(file=blob, 其后有文件内容定界符)
 util.httpFormData = function(url,data,success,error){
     $.ajax({
         url:url,
