@@ -229,7 +229,7 @@ function fileGet(path) {
                 console.log(data)
                 if (data.fileType==1){
                     let folder = util.format(`<a href="#" onclick="fileGet('{1}')" style="text-decoration: none"><i class="fa fa-folder-o"></i><span>&nbsp;&nbsp;{0}</span></a>`,data.fileName,pathDom.value+"/"+data.fileName);
-                    str += util.format(tmp,data.fileName,folder,"-","-","dir")
+                    str += util.format(tmp,data.fileName,folder,"-",data.createTime,"dir")
                 }else {
                     let file = util.format(`<i class="fa fa-file-o"></i><span>&nbsp;&nbsp;{0}</span>`,data.fileName);
                     str += util.format(tmp,data.fileName,file,util.b2string(data.fileSize,1024),data.createTime,"file")
