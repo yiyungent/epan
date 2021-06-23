@@ -19,6 +19,12 @@ public class HDFSServiceImpl implements HDFSService {
     @Value("${hadoop.hdfs.uri}")
     private String hdfsURI;
 
+    @Value("${dfs.client.use.datanode.hostname}")
+    private String dfsClientUseDataNodeHostName;
+
+    @Value("${dfs.replication}")
+    private String dfsReplication;
+
     /**
      * 获取 HDFS 文件系统对象
      */
@@ -27,8 +33,8 @@ public class HDFSServiceImpl implements HDFSService {
         FileSystem fs = null;
         try {
             Configuration conf = new Configuration();
-            conf.set("dfs.client.use.datanode.hostname", "true");
-            conf.set("dfs.replication", "1");
+            conf.set("dfs.client.use.datanode.hostname", dfsClientUseDataNodeHostName);
+            conf.set("dfs.replication", dfsReplication);
 
             fs = FileSystem.get(URI.create(hdfsURI), conf);
         } catch (Exception e) {
