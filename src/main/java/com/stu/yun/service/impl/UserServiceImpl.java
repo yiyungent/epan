@@ -6,6 +6,8 @@ import com.stu.yun.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -35,6 +37,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserInfo queryById(int id) {
         return this.userDao.queryById(id);
+    }
+
+    @Override
+    public List<UserInfo> queryByIpAddress(String ipAddress) {
+        return this.userDao.queryByIpAddress(ipAddress);
     }
 
 }

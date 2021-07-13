@@ -27,11 +27,11 @@ CREATE TABLE `realfile` (
   `filePath` varchar(5000) NOT NULL,
   `fileSize` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `realfile` */
 
-insert  into `realfile`(`id`,`signKey`,`sourceType`,`filePath`,`fileSize`) values (2,'3455bb57e4b4906bbea67b58cca78fa8',0,'/epan-hdfs/2021/06/21/a2f3e266-769f-4d1d-83db-813899913651',214092195);
+insert  into `realfile`(`id`,`signKey`,`sourceType`,`filePath`,`fileSize`) values (1,'324bc65f180d1aa3f3e87051eb98b1cd',1,'/epan-upyun/2021/07/13/ad9abf17-93d9-4b3d-b0d3-dc909efde7c8',28886);
 
 /*Table structure for table `userinfo` */
 
@@ -43,12 +43,14 @@ CREATE TABLE `userinfo` (
   `password` varchar(2000) NOT NULL,
   `diskSize` bigint(20) NOT NULL DEFAULT '0',
   `usedDiskSize` bigint(20) NOT NULL DEFAULT '0',
+  `ipAddress` varchar(2000) NOT NULL,
+  `createTime` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `userinfo` */
 
-insert  into `userinfo`(`id`,`userName`,`password`,`diskSize`,`usedDiskSize`) values (1,'admin','admin',10737418240,0),(2,'mike','mike',10737418240,0);
+insert  into `userinfo`(`id`,`userName`,`password`,`diskSize`,`usedDiskSize`,`ipAddress`,`createTime`) values (1,'root','root',10485760,57772,'127.0.0.1','2021-07-12 18:24:04'),(4,'中文','dewr',10485760,0,'127.0.0.1','2021-07-13 18:24:09'),(5,'呵呵','erqre',10485760,0,'0:0:0:0:0:0:0:1','2021-07-13 10:21:54');
 
 /*Table structure for table `virtualfile` */
 
@@ -63,11 +65,11 @@ CREATE TABLE `virtualfile` (
   `realFileId` int(11) NOT NULL DEFAULT '0',
   `createTime` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
 
 /*Data for the table `virtualfile` */
 
-insert  into `virtualfile`(`id`,`parentId`,`fileType`,`fileName`,`userInfoId`,`realFileId`,`createTime`) values (5,0,0,'hadoop-2.7.3.tar.gz',1,2,'2021-06-21 06:13:56'),(6,0,1,'hadoop',1,0,'2021-06-21 06:14:18'),(7,6,0,'hadoop-2.7.3.tar.gz',1,2,'2021-06-21 06:14:30');
+insert  into `virtualfile`(`id`,`parentId`,`fileType`,`fileName`,`userInfoId`,`realFileId`,`createTime`) values (1,0,1,'maps',1,0,'2021-07-13 09:31:51'),(2,1,0,'你们喜欢的大地图(10p).tmx',1,1,'2021-07-13 09:41:29'),(3,1,0,'你们喜欢的大地图(10p) (1).tmx',1,1,'2021-07-13 10:27:22');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

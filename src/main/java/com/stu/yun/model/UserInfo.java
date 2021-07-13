@@ -1,5 +1,7 @@
 package com.stu.yun.model;
 
+import java.util.Date;
+
 public class UserInfo {
 
     private int id;
@@ -16,6 +18,10 @@ public class UserInfo {
      * 已经使用的磁盘大小: Byte
      */
     private Long usedDiskSize;
+
+    private String ipAddress;
+
+    private Date createTime;
 
 
 
@@ -59,4 +65,19 @@ public class UserInfo {
         this.usedDiskSize = usedDiskSize;
     }
 
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 }

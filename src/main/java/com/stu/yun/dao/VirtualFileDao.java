@@ -22,4 +22,6 @@ public interface VirtualFileDao {
     VirtualFile queryByPath(int userId, String fileName, int parentId);
 
     List<VirtualFile> queryByRealFileId(int realFileId);
+
+    List<VirtualFile> all();
 }

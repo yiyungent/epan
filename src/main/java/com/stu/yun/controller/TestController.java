@@ -1,6 +1,6 @@
 package com.stu.yun.controller;
 
-import com.stu.yun.service.HDFSService;
+import com.stu.yun.service.FileService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +19,7 @@ import java.net.URLEncoder;
 public class TestController {
 
     @Autowired
-    private HDFSService hdfsService;
+    private FileService hdfsService;
 
     @PostMapping("upload")
     public String upload(@RequestParam("file") MultipartFile file) throws Exception {

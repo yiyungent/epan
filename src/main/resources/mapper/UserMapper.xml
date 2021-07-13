@@ -8,11 +8,13 @@
         <result property="password" column="password"/>
         <result property="diskSize" column="diskSize"/>
         <result property="usedDiskSize" column="usedDiskSize"/>
+        <result property="ipAddress" column="ipAddress"/>
+        <result property="createTime" column="createTime"/>
     </resultMap>
 
     <select id="queryByUserName" resultType="com.stu.yun.model.UserInfo">
         select
-            id, userName, password, diskSize, usedDiskSize
+            id, userName, password, diskSize, usedDiskSize, ipAddress, createTime
         from
             userInfo
         where userName = #{userName}
@@ -20,10 +22,18 @@
 
     <select id="queryById" resultType="com.stu.yun.model.UserInfo">
         select
-            id, userName, password, diskSize, usedDiskSize
+            id, userName, password, diskSize, usedDiskSize, ipAddress, createTime
         from
             userInfo
         where id = #{id}
+    </select>
+
+    <select id="queryByIpAddress" resultType="com.stu.yun.model.UserInfo">
+        select
+            id, userName, password, diskSize, usedDiskSize, ipAddress, createTime
+        from
+            userInfo
+        where ipAddress = #{ipAddress}
     </select>
 
     <update id="update" parameterType="com.stu.yun.model.UserInfo">
@@ -37,9 +47,9 @@
 
     <insert id="insert" parameterType="com.stu.yun.model.UserInfo" keyProperty="id" useGeneratedKeys="true">
         insert into
-            userInfo(id, userName, password, diskSize, usedDiskSize)
+            userInfo(id, userName, password, diskSize, usedDiskSize, ipAddress, createTime)
         values
-            (#{id}, #{userName}, #{password}, #{diskSize}, #{usedDiskSize})
+            (#{id}, #{userName}, #{password}, #{diskSize}, #{usedDiskSize}, #{ipAddress}, #{createTime})
     </insert>
 
 </mapper>

@@ -134,4 +134,9 @@ public class VirtualFileServiceImpl implements VirtualFileService {
     public List<VirtualFile> queryByRealFileId(int realFileId) {
         return this.virtualFileDao.queryByRealFileId(realFileId);
     }
+
+    @Override
+    public List<VirtualFile> all() {
+        return this.virtualFileDao.all();
+    }
 }

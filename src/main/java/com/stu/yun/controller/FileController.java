@@ -1,16 +1,18 @@
 package com.stu.yun.controller;
 
+import com.stu.yun.config.UploadConfig;
 import com.stu.yun.model.RealFile;
 import com.stu.yun.model.UserInfo;
 import com.stu.yun.model.VirtualFile;
 import com.stu.yun.requestModel.UploadCheckReq;
 import com.stu.yun.responseModel.*;
-import com.stu.yun.service.HDFSService;
+import com.stu.yun.service.FileService;
 import com.stu.yun.service.RealFileService;
 import com.stu.yun.service.UserService;
 import com.stu.yun.service.VirtualFileService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,7 +31,7 @@ import java.util.*;
 public class FileController {
 
     @Autowired
-    private HDFSService hdfsService;
+    private FileService hdfsService;
 
     @Autowired
     private VirtualFileService virtualFileService;
@@ -40,13 +42,17 @@ public class FileController {
     @Autowired
     private UserService userService;
 
-    private static final String HDFS_FilePath_Base = "/epan-hdfs/";
+    @Value("${upload.sourceType}")
+    private int sourceType;
+
+    @Value("${upload.allowFileExts}")
+    private String allowFileExts;
 
     /**
      * 当前登录用户 文件列表
      *
      * @param session
-     * @param path 当前文件夹路径: 文件夹a/文件夹b/文件夹c
+     * @param path    当前文件夹路径: 文件夹a/文件夹b/文件夹c
      * @return
      */
     @GetMapping("list")
@@ -144,11 +150,34 @@ public class FileController {
             // 1. 获取当前登录用户
             UserInfo currentUser = (UserInfo) session.getAttribute("user");
 
+            // 检查文件后缀 (扩展名)
+            List<String> allowExts = Arrays.asList(this.allowFileExts.split(","));
+            // 不包括点 .
+            String fileExt_2 = inputModel.getFileName().substring(inputModel.getFileName().lastIndexOf(".") + 1);
+            if (!allowExts.contains(fileExt_2)) {
+                response.setCode(-9);
+                response.setMessage("上传失败: 不允许上传此文件类型: " + fileExt_2);
+
+                return response;
+            }
+
             // 2. 秒传检验
             // 2.1 接收客户端计算的文件MD5
             // 2.2 select RealFile: 查询 RealFile 是否已存在 相同 MD5
             RealFile realFile = this.realFileService.queryBySignKey(inputModel.getFileSignKey());
             if (realFile != null) {
+
+                // 检查是否允许继续上传
+                // 获取上传文件的大小 (Byte)
+                Long fileSizeByte = realFile.getFileSize();
+                if (currentUser.getUsedDiskSize() + fileSizeByte > currentUser.getDiskSize()) {
+                    // 超出限制
+                    response.setCode(-10);
+                    response.setMessage("上传失败: 超出容量限制");
+
+                    return response;
+                }
+
                 // 2.3 已存在: insert VirtualFile, 响应 秒传成功
                 VirtualFile virtualFile = new VirtualFile();
                 virtualFile.setCreateTime(new Date());
@@ -204,11 +233,43 @@ public class FileController {
         try {
             // 1. 获取当前登录用户
             UserInfo currentUser = (UserInfo) session.getAttribute("user");
+            // 检查是否允许继续上传
+
+            // 检查文件后缀 (扩展名)
+            List<String> allowExts = Arrays.asList(this.allowFileExts.split(","));
+            // 不包括点 .
+            // String fileExt_1 = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".") + 1);
+            String fileExt_2 = fileName.substring(fileName.lastIndexOf(".") + 1);
+            if (!allowExts.contains(fileExt_2)) {
+                response.setCode(-9);
+                response.setMessage("上传失败: 不允许上传此文件类型: " + fileExt_2);
+
+                return response;
+            }
+
+            // 获取上传文件的大小 (Byte)
+            Long fileSizeByte = file.getSize();
+            if (currentUser.getUsedDiskSize() + fileSizeByte > currentUser.getDiskSize()) {
+                // 超出限制
+                response.setCode(-10);
+                response.setMessage("上传失败: 超出容量限制");
+
+                return response;
+            }
+
 
             // 2. 上传文件
             // 注意: 抵达此处，说明文件不存在于服务端，这里相信客户端计算结果，不再上传到服务端后，再次计算文件MD5, 而是直接上传
             // 2.1 接收文件上传
-            String fullFilePath = HDFS_FilePath_Base;
+            String fullFilePath = UploadConfig.HDFS_FilePath_Base;
+            switch (this.sourceType) {
+                case 0:
+                    fullFilePath = UploadConfig.HDFS_FilePath_Base;
+                    break;
+                case 1:
+                    fullFilePath = UploadConfig.Upyun_FilePath_Base;
+                    break;
+            }
             // 使用 日期作为 目录
             SimpleDateFormat dfTime = new SimpleDateFormat("yyyy/MM/dd/");
             fullFilePath += dfTime.format(new Date());
@@ -224,11 +285,11 @@ public class FileController {
 
             // 2.2 insert RealFile
             RealFile realFile = new RealFile();
-            realFile.setSourceType(0);
+//            realFile.setSourceType(0);
+            realFile.setSourceType(this.sourceType);
             realFile.setFilePath(fullFilePath);
             realFile.setSignKey(fileSignKey);
-            // TODO: 获取上传文件的大小 (Byte)
-            Long fileSizeByte = file.getSize();
+
             realFile.setFileSize(fileSizeByte);
 
             isSuccess = this.realFileService.insert(realFile);
@@ -308,7 +369,7 @@ public class FileController {
         int fileId = 0;
         // 寻找此文件夹下 目标文件
         for (VirtualFile item : virtualFileList) {
-            if (item.getFileName().equals(fileName)&&item.getFileType()==0) {
+            if (item.getFileName().equals(fileName) && item.getFileType() == 0) {
                 fileId = item.getId();
                 break;
             }
@@ -413,7 +474,7 @@ public class FileController {
      * @param fileId
      * @return
      */
-    private void deleteDir(int fileId, int userId){
+    private void deleteDir(int fileId, int userId) {
         VirtualFile virtualFile = this.virtualFileService.queryById(fileId);
         if (virtualFile.getFileType() == 0) {
             // 单个普通文件
@@ -467,10 +528,11 @@ public class FileController {
 
     /**
      * 更新用户使用容量
+     *
      * @param updateSize
      * @param userId
      */
-    private void updateUserUsedDiskSize(Long updateSize, int userId){
+    private void updateUserUsedDiskSize(Long updateSize, int userId) {
         UserInfo user = this.userService.queryById(userId);
         if (user != null) {
             Long usedDiskSize = user.getUsedDiskSize();
