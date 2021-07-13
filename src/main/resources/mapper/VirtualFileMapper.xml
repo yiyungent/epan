@@ -16,6 +16,8 @@
             <result property="password" column="password"/>
             <result property="diskSize" column="diskSize"/>
             <result property="usedDiskSize" column="usedDiskSize"/>
+            <result property="ipAddress" column="ipAddress"/>
+            <result property="createTime" column="createTime"/>
         </association>
         <association property="realFile" javaType="RealFile">
             <id property="id" column="realFileId"/>
