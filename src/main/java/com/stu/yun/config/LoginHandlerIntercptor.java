@@ -22,12 +22,16 @@ public class LoginHandlerIntercptor implements HandlerInterceptor {
         // 这个是登录时注册到session中的值
 //        Object user=request.getSession().getAttribute("user");
         UserInfo user = this.userService.currentUser();
+        System.out.println("登录拦截 start");
         if (user == null) {
             //未登录
+            System.out.println("登录拦截: 未登录");
             request.setAttribute("message", "没有权限请先登录");
             request.getRequestDispatcher("/login.html").forward(request, response);
             return false;
         } else {
+            System.out.println("登录拦截: " + user.getUserName());
+
             return true;
         }
     }

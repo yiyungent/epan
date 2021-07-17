@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -31,7 +33,7 @@ public class UserController {
     private String jwtSecret;
 
     @PostMapping("login")
-    public JsonResponse login(String userName, String password, HttpServletRequest request) {
+    public JsonResponse login(String userName, String password, HttpServletRequest request, HttpServletResponse res) {
         UserInfo userInfo = this.userService.queryByUserName(userName);
         // TODO: 用户密码加盐md5
         JsonResponse response = new JsonResponse();
@@ -49,6 +51,16 @@ public class UserController {
         // 对于 WebAPI 不使用 Session 时, 采用 JWT
         String token = JWTUtil.createToken(userInfo, this.jwtSecret);
         response.setData(token);
+
+        // 创建一个 cookie对象
+        Cookie cookie = new Cookie("token", token);
+        cookie.setMaxAge(7 * 24 * 60 * 60); // 7天过期
+        // 当从ajax请求设置cookie时，设置 Path 选项很重要
+        // https://www.it1352.com/548677.html
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        //将cookie对象加入response响应
+        res.addCookie(cookie);
 
         System.out.println("login: " + userInfo.getUserName());
 
