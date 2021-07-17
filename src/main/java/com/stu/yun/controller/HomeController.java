@@ -22,9 +22,7 @@ public class HomeController {
     }
 
     @GetMapping("exit")
-    public String exit(HttpSession session) {
-        session.setAttribute("user", null);
-
+    public String exit() {
         return "login.html";
     }
 

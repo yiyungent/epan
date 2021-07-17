@@ -3,11 +3,15 @@ package com.stu.yun.controller;
 import com.stu.yun.model.UserInfo;
 import com.stu.yun.responseModel.JsonResponse;
 import com.stu.yun.service.UserService;
+import com.stu.yun.utils.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -23,12 +27,15 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
     @PostMapping("login")
     public JsonResponse login(String userName, String password, HttpServletRequest request) {
         UserInfo userInfo = this.userService.queryByUserName(userName);
         // TODO: 用户密码加盐md5
         JsonResponse response = new JsonResponse();
-        if (!userInfo.getPassword().equals(password)) {
+        if (userInfo == null || userInfo.getPassword() == null || !userInfo.getPassword().equals(password)) {
             response.setCode(-1);
             response.setMessage("登录失败: 用户名或密码不正确");
             return response;
@@ -38,9 +45,11 @@ public class UserController {
         // TODO: user responseModel
         // Temp: 敏感数据置空
         userInfo.setPassword("");
-        response.setData(userInfo);
-        // TODO: 对于 WebAPI 不使用 Session 时, 采用 JWT
-        request.getSession().setAttribute("user", userInfo);
+
+        // 对于 WebAPI 不使用 Session 时, 采用 JWT
+        String token = JWTUtil.createToken(userInfo, this.jwtSecret);
+        response.setData(token);
+
         System.out.println("login: " + userInfo.getUserName());
 
         return response;
@@ -114,7 +123,8 @@ public class UserController {
     }
 
     @GetMapping("info")
-    public JsonResponse info(@SessionAttribute("user") UserInfo user, HttpSession session) {
+    public JsonResponse info() {
+        UserInfo user = this.userService.currentUser();
         JsonResponse response = new JsonResponse();
         if (user == null) {
             response.setCode(-1);
@@ -126,8 +136,6 @@ public class UserController {
 
         // 更新用户信息
         user = this.userService.queryById(user.getId());
-        session.setAttribute("user", user);
-        // TODO: user responseModel
         // Temp: 敏感数据置空
         user.setPassword("");
         response.setData(user);

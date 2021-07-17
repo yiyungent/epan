@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpSession;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -51,14 +50,13 @@ public class FileController {
     /**
      * 当前登录用户 文件列表
      *
-     * @param session
      * @param path    当前文件夹路径: 文件夹a/文件夹b/文件夹c
      * @return
      */
     @GetMapping("list")
-    public JsonResponse list(HttpSession session, String path) {
+    public JsonResponse list(String path) {
         // 1. 获取当前登录用户
-        UserInfo currentUser = (UserInfo) session.getAttribute("user");
+        UserInfo currentUser = this.userService.currentUser();
 
         // 2. 获取 虚拟文件目录
         List<VirtualFile> virtualFileList = this.virtualFileService.userList(currentUser.getId(), path);
@@ -96,14 +94,13 @@ public class FileController {
     /**
      * 当前登录用户 文件列表
      *
-     * @param session
      * @param fileParentId 当前要查看的 虚拟文件父级ID, 查看根目录则为 null/0
      * @return
      */
 //    @GetMapping("list")
-    public JsonResponse list(HttpSession session, Integer fileParentId) {
+    public JsonResponse list(Integer fileParentId) {
         // 1. 获取当前登录用户
-        UserInfo currentUser = (UserInfo) session.getAttribute("user");
+        UserInfo currentUser = this.userService.currentUser();
 
         // 2. 获取 虚拟文件目录
         List<VirtualFile> virtualFileList = this.virtualFileService.userList(currentUser.getId(), fileParentId);
@@ -144,11 +141,11 @@ public class FileController {
      * @return
      */
     @PostMapping("uploadCheck")
-    public JsonResponse uploadCheck(HttpSession session, @RequestBody UploadCheckReq inputModel) {
+    public JsonResponse uploadCheck(@RequestBody UploadCheckReq inputModel) {
         JsonResponse response = new JsonResponse();
         try {
             // 1. 获取当前登录用户
-            UserInfo currentUser = (UserInfo) session.getAttribute("user");
+            UserInfo currentUser = this.userService.currentUser();
 
             // 检查文件后缀 (扩展名)
             List<String> allowExts = Arrays.asList(this.allowFileExts.split(","));
@@ -227,12 +224,12 @@ public class FileController {
     }
 
     @PostMapping("upload")
-    public JsonResponse upload(HttpSession session, @RequestParam("file") MultipartFile file, @RequestParam("fileSignKey") String fileSignKey, String path, String fileName)
+    public JsonResponse upload(@RequestParam("file") MultipartFile file, @RequestParam("fileSignKey") String fileSignKey, String path, String fileName)
             throws Exception {
         JsonResponse response = new JsonResponse();
         try {
             // 1. 获取当前登录用户
-            UserInfo currentUser = (UserInfo) session.getAttribute("user");
+            UserInfo currentUser = this.userService.currentUser();
             // 检查是否允许继续上传
 
             // 检查文件后缀 (扩展名)
@@ -356,10 +353,10 @@ public class FileController {
      * @throws Exception
      */
     @GetMapping("download")
-    public ResponseEntity<byte[]> download(HttpSession session, String path, String fileName)
+    public ResponseEntity<byte[]> download(String path, String fileName)
             throws Exception {
         // 1. 获取当前登录用户
-        UserInfo currentUser = (UserInfo) session.getAttribute("user");
+        UserInfo currentUser = this.userService.currentUser();
         // TODO: 效验文件权限: 此 VirtualFile 是否属于 当前用户
 
         // 2. 下载文件
@@ -389,11 +386,11 @@ public class FileController {
 
 
     @GetMapping("mkdir")
-    public JsonResponse mkDir(HttpSession session, String path) {
+    public JsonResponse mkDir(String path) {
         JsonResponse response = new JsonResponse();
         try {
             // 1. 获取当前登录用户
-            UserInfo currentUser = (UserInfo) session.getAttribute("user");
+            UserInfo currentUser = this.userService.currentUser();
             // TODO: 效验文件权限: 此 VirtualFile 是否属于 当前用户
 
             // 2. 创建文件夹
@@ -423,16 +420,15 @@ public class FileController {
      * 1.单个普通文件
      * 2.文件夹: 及其内部所有文件
      *
-     * @param session
      * @return
      */
     @GetMapping("delete")
-    public JsonResponse delete(HttpSession session, String path, String fileName) {
+    public JsonResponse delete(String path, String fileName) {
         // TODO: 删除操作 当文件夹内文件较多时，较为耗时，应改为后台运行任务
         JsonResponse response = new JsonResponse();
         try {
             // 1. 获取当前登录用户
-            UserInfo currentUser = (UserInfo) session.getAttribute("user");
+            UserInfo currentUser = this.userService.currentUser();
             // TODO: 效验文件权限: 此 VirtualFile 是否属于 当前用户
 
             // 2. 删除文件

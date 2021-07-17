@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface UserService {
 
+    UserInfo currentUser();
+
     UserInfo queryByUserName(String userName);
 
     UserInfo insert(UserInfo userInfo);

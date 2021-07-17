@@ -3,7 +3,10 @@ package com.stu.yun.service.impl;
 import com.stu.yun.dao.UserDao;
 import com.stu.yun.model.UserInfo;
 import com.stu.yun.service.UserService;
+import com.stu.yun.utils.HttpServletUtil;
+import com.stu.yun.utils.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,6 +16,34 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserDao userDao;
+
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
+    @Override
+    public UserInfo currentUser() {
+        UserInfo user = null;
+        // 1. 先尝试从 headers.Authorization 中找 token
+        String token = HttpServletUtil.getRequestHeader("Authorization");
+        if (token != null && !token.isEmpty()) {
+            token = token.substring("Bearer ".length());
+            user = JWTUtil.verify(token, this.jwtSecret);
+            if (user != null) {
+                user = this.userDao.queryById(user.getId());
+            }
+        } else {
+            // 2. 再尝试从 Cookie 中找
+            token = HttpServletUtil.getCookie("token");
+            if (token != null && !token.isEmpty()){
+                user = JWTUtil.verify(token, this.jwtSecret);
+                if (user != null) {
+                    user = this.userDao.queryById(user.getId());
+                }
+            }
+        }
+
+        return user;
+    }
 
     @Override
     public UserInfo queryByUserName(String userName) {

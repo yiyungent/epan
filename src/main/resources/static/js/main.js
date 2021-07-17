@@ -66,6 +66,14 @@ window.onload = function() {
 
 };
 
+function exit() {
+    localStorage.clear();
+    util.clearCookie();
+    window.location.href = "/login";
+
+    return false;
+}
+
 function refresh() {
     fileGet(pathDom.value)
 }
