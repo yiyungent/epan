@@ -117,7 +117,7 @@
             v.realFileId = #{realFileId}
     </select>
 
-    <select id="all">
+    <select id="queryAllByLimit" resultMap="virtualFileMap">
         select
             v.id, v.parentId, v.fileType, v.fileName, v.userInfoId, v.realFileId, v.createTime,
             u.userName, u.password, u.diskSize, u.usedDiskSize,
@@ -132,6 +132,7 @@
             on v.realFileId = r.id
         order by
             v.createTime desc
+        limit #{offset}, #{limit}
     </select>
 
     <insert id="insert" parameterType="com.stu.yun.model.VirtualFile" keyProperty="id" useGeneratedKeys="true">

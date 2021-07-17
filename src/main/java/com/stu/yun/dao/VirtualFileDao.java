@@ -24,4 +24,6 @@ public interface VirtualFileDao {
     List<VirtualFile> queryByRealFileId(int realFileId);
 
     List<VirtualFile> all();
+
+    List<VirtualFile> queryAllByLimit(Integer offset, Integer limit);
 }

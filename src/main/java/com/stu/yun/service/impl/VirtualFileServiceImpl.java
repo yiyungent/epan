@@ -136,7 +136,18 @@ public class VirtualFileServiceImpl implements VirtualFileService {
     }
 
     @Override
-    public List<VirtualFile> all() {
-        return this.virtualFileDao.all();
+    public List<VirtualFile> queryAllByLimit(Integer page, Integer limit) {
+        int offset = 0;
+        //判断offset   和limit  是否为null
+        if(page != null && limit != null){
+            offset = (page-1)*limit;
+        }else{
+            offset = 0;
+            limit = 10;
+        }
+        List<VirtualFile> models = this.virtualFileDao.queryAllByLimit(offset, limit);
+        return models;
     }
+
+
 }

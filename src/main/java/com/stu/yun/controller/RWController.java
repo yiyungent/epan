@@ -34,9 +34,9 @@ public class RWController {
 
 
     @GetMapping("maps")
-    public JsonResponse maps() {
+    public JsonResponse maps(Integer page, Integer limit) {
         // 2. 获取 虚拟文件目录
-        List<VirtualFile> virtualFileList = this.virtualFileService.all();
+        List<VirtualFile> virtualFileList = this.virtualFileService.queryAllByLimit(page, limit);
         if (virtualFileList == null) {
             virtualFileList = new ArrayList<>();
         }

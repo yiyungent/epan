@@ -24,5 +24,5 @@ public interface VirtualFileService {
 
     List<VirtualFile> queryByRealFileId(int realFileId);
 
-    List<VirtualFile> all();
+    List<VirtualFile> queryAllByLimit(Integer page, Integer limit);
 }

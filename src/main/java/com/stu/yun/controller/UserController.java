@@ -24,7 +24,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("login")
-    public JsonResponse login(String userName, String password, HttpSession session) {
+    public JsonResponse login(String userName, String password, HttpServletRequest request) {
         UserInfo userInfo = this.userService.queryByUserName(userName);
         // TODO: 用户密码加盐md5
         JsonResponse response = new JsonResponse();
@@ -40,7 +40,8 @@ public class UserController {
         userInfo.setPassword("");
         response.setData(userInfo);
         // TODO: 对于 WebAPI 不使用 Session 时, 采用 JWT
-        session.setAttribute("user", userInfo);
+        request.getSession().setAttribute("user", userInfo);
+        System.out.println("login: " + userInfo.getUserName());
 
         return response;
     }
