@@ -57,7 +57,7 @@
                     } else {
                         // 一切正确
                         localStorage.setItem("token", data.data);
-                        util.setCookie("token", data.data);
+                        util.setCookie("token", data.data, 7);
                         window.location.href = "/";
                     }
                 }
