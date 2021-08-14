@@ -4,7 +4,7 @@
 </p>
 <h1 align="center">epan</h1>
 
-> 基于 SpringBoot 的在线云盘, 支持对接 Hadoop 存储源
+> 基于 SpringBoot 的在线云盘, 支持对接 Hadoop, 又拍云 存储源
 
 [![repo size](https://img.shields.io/github/repo-size/yiyungent/epan.svg?style=flat)]()
 [![LICENSE](https://img.shields.io/github/license/yiyungent/epan.svg?style=flat)](https://github.com/yiyungent/epan/blob/master/LICENSE)
@@ -16,7 +16,7 @@
 一个简单的云盘
 
 > SpringBoot + MyBatis + Maven + MySQL  
-> 文件存储于 Hadoop HDFS 中
+> 文件存储于 Hadoop HDFS, 又拍云 中
 
 ## 技术
 
